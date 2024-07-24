@@ -2,6 +2,11 @@ package com.example.perform_back.controller;
 
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.service.ReviewPostService;
+
+import java.util.List;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/reviewpost")
+@Tag(name = "Reviewpost", description = "Reviewpost API")
 public class ReviewPostController {
 
     private final ReviewPostService reviewPostService;
