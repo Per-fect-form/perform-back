@@ -18,4 +18,13 @@ public class Attachment {
     @JoinColumn(name = "post_id")
     @JsonBackReference
     private Post post;
+
+    public Attachment(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
+
+    public Attachment() {
+
+    }
 }
