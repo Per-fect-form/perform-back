@@ -24,14 +24,14 @@ public class VoteService {
 
     @Transactional
     public void agree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Invalid vote ID"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("해당 아이디의 심사게시물이 존재하지 않습니다"));
         vote.setAgreeNum(vote.getAgreeNum() + 1);
         voteRepository.save(vote);
     }
 
     @Transactional
     public void disagree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Invalid vote ID"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("해당 아이디의 심사게시물이 존재하지 않습니다"));
         vote.setDisagreeNum(vote.getDisagreeNum() + 1);
         voteRepository.save(vote);
     }
