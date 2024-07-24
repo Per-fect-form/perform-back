@@ -2,7 +2,6 @@ package com.example.perform_back.controller;
 
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.service.ReviewPostService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/reviewpost")
@@ -24,8 +24,9 @@ public class ReviewPostController {
 
     @PostMapping("/upload")
     public void createReviewPost(@RequestParam("title") String title,
-        @RequestParam("content") String content) {
-        reviewPostService.createReviewPost(title, content);
+        @RequestParam("content") String content,
+        @RequestParam("file")MultipartFile file) {
+        reviewPostService.createReviewPost(title, content, file);
     }
 
     @GetMapping("/{id}")
