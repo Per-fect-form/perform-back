@@ -1,5 +1,7 @@
 package com.example.perform_back.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,13 +29,17 @@ public class Vote {
     private Date dueDate;
 
     @OneToOne(mappedBy = "vote")
+    @JsonBackReference
     private ReviewPost reviewPost;
 
     public Vote() {
 
         this.createdDate = new Date();
-        // dueDate�� ���� ��¥�κ��� ������ �ķ� ����
-        this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); //�׽�Ʈ�� ���� dueDate�� 1�� �ڷ� ����
-        //this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
+
+        this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
+
+        //this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); 
+        this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
+
     }
 }

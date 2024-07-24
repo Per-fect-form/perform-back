@@ -19,6 +19,13 @@ public class Attachment {
     @JsonBackReference
     private Post post;
 
+    @ManyToOne
+    @JoinColumn(name = "review_post_id")
+    @JsonBackReference
+    private ReviewPost reviewPost;
+
+
+
     public Attachment(String name, String path) {
         this.name = name;
         this.path = path;
