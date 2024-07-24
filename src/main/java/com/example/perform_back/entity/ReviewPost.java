@@ -23,7 +23,7 @@ public class ReviewPost {
     @OneToOne
     @JoinColumn(name = "vote_id")
     private Vote vote;
-    private String reviewStatus; //½É»ç Áß, ÇÕ°Ý, ºÒÇÕ°Ý
+    private String reviewStatus; //ï¿½É»ï¿½ ï¿½ï¿½, ï¿½Õ°ï¿½, ï¿½ï¿½ï¿½Õ°ï¿½
     private String title;
     private String content;
     @Temporal(TemporalType.TIMESTAMP)

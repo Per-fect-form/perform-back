@@ -32,8 +32,8 @@ public class Vote {
     public Vote() {
 
         this.createdDate = new Date();
-        // dueDate¸¦ ÇöÀç ³¯Â¥·ÎºÎÅÍ ÀÏÁÖÀÏ ÈÄ·Î ¼³Á¤
-        this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); //Å×½ºÆ®¸¦ À§ÇØ dueDate¸¦ 1ºÐ µÚ·Î ¼öÁ¤
+        // dueDateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Â¥ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä·ï¿½ ï¿½ï¿½ï¿½ï¿½
+        this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); //ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ dueDateï¿½ï¿½ 1ï¿½ï¿½ ï¿½Ú·ï¿½ ï¿½ï¿½ï¿½ï¿½
         //this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
     }
 }
