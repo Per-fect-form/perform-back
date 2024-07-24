@@ -24,29 +24,29 @@ public class VoteService {
 
     @Transactional
     public void agree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("ÇØ´ç ¾ÆÀÌµðÀÇ ½É»ç°Ô½Ã¹°ÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ï¿½ï¿½ ï¿½É»ï¿½Ô½Ã¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½"));
         vote.setAgreeNum(vote.getAgreeNum() + 1);
         voteRepository.save(vote);
     }
 
     @Transactional
     public void disagree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("ÇØ´ç ¾ÆÀÌµðÀÇ ½É»ç°Ô½Ã¹°ÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ï¿½ï¿½ ï¿½É»ï¿½Ô½Ã¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½"));
         vote.setDisagreeNum(vote.getDisagreeNum() + 1);
         voteRepository.save(vote);
     }
-    @Scheduled(cron = "0 0 * * * *") // ¸Å ½Ã°£¸¶´Ù ½ÇÇà, ÃÊ ºÐ ½Ã ÀÏ ¿ù ¿äÀÏ
+    @Scheduled(cron = "0 0 * * * *") // ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     @Transactional
     public void updateReviewStatuses() {
         Date now = new Date();
-        List<Vote> votes = voteRepository.findAll(); //ÅõÇ¥ ÀüÃ¼¸¦ ¸®½ºÆ®·Î °¡Á®¿À±â
+        List<Vote> votes = voteRepository.findAll(); //ï¿½ï¿½Ç¥ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-        for (Vote vote : votes) { //ÇÏ³ª¾¿ °Ë»ç
-            if (vote.getDueDate().before(now)) { //¸¶°¨±âÇÑÀ» Áö³µÀ¸¸é
+        for (Vote vote : votes) { //ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
+            if (vote.getDueDate().before(now)) { //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 ReviewPost reviewPost = vote.getReviewPost();
-                //ºñÀ² °è»ê
+                //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 int totalVotes = vote.getAgreeNum() + vote.getDisagreeNum();
-                if (totalVotes > 0 && ((double) vote.getAgreeNum() / totalVotes) >= 0.7) { //ÀüÃ¼ ÅõÇ¥ ¼ö´Â À¯Àú ¼ö ´ëºñ·Î Â÷ÈÄ ¼öÁ¤
+                if (totalVotes > 0 && ((double) vote.getAgreeNum() / totalVotes) >= 0.7) { //ï¿½ï¿½Ã¼ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     reviewPost.setReviewStatus("pass");
                 } else {
                     reviewPost.setReviewStatus("non_pass");
