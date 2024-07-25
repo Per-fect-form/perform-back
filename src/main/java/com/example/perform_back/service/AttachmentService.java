@@ -42,4 +42,12 @@ public class AttachmentService {
     public List<Attachment> findByPost(Post savedPost) {
         return attachmentRepository.findByPost(savedPost);
     }
+
+    public void deleteByPost(Post post) {
+        List<Attachment> attachments = attachmentRepository.findByPost(post);
+        for (Attachment attachment : attachments){
+            imageS3Service.deleteImage(attachment);
+            attachmentRepository.deleteById(attachment.getId());
+        }
+    }
 }

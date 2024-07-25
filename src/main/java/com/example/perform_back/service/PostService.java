@@ -43,4 +43,20 @@ public class PostService {
 
         return savedPost;
     }
+
+    public Post findById(Long id) {
+        Optional<Post> post = postRepository.findById(id);
+        if (post.isPresent())
+            return post.get();
+        else
+            throw new RuntimeException("Post not found");
+    }
+
+    public void deleteById(Long id) {
+         Optional<Post> post = postRepository.findById(id);
+         if(post.isEmpty())
+             throw new RuntimeException("Post not found");
+         attachmentService.deleteByPost(post.get());
+         postRepository.delete(post.get());
+    }
 }

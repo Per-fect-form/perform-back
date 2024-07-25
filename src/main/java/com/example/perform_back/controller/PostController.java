@@ -23,12 +23,23 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> getAllPost(){
+    public List<Post> getAllPosts(){
         return this.postService.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/upload")
     public Post createPost(@RequestPart("post") PostDto post, @RequestPart(value = "file", required = false) MultipartFile file) {
         return this.postService.save(post, file);
     }
+
+    @GetMapping("/{id}")
+    public Post getPost(@PathVariable Long id) {
+        return this.postService.findById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePostById(@PathVariable Long id) {
+        this.postService.deleteById(id);
+    }
+
 }
