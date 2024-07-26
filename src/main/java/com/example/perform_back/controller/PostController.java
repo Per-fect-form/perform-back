@@ -44,10 +44,10 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public void updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
+    public Post updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
                                @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        this.postService.updateById(id, postDto, attachmentsDto, files);
+        return this.postService.updateById(id, postDto, attachmentsDto, files);
     }
 
 }

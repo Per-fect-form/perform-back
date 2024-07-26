@@ -31,17 +31,12 @@ public class PostService {
     }
 
     public Post save(PostDto postDto, MultipartFile[] files) {
-        Post post = convertToPost(postDto, new Post());
-        Post savedPost = postRepository.save(post);
-
+        Post postToSave = convertToPost(postDto, new Post());
+        postToSave = postRepository.save(postToSave);
         if (files != null && files.length > 0) {
-            for (MultipartFile file : files) {
-                attachmentService.savePostWithAttachment(post, file);
-            }
-            savedPost.setAttachments(attachmentService.findByPost(savedPost));
+            saveMultipartFiles(files, postToSave);
         }
-
-        return savedPost;
+        return postToSave;
     }
 
     public Post findById(Long id) {
@@ -60,7 +55,7 @@ public class PostService {
          postRepository.delete(post.get());
     }
 
-    public void updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files) {
+    public Post updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files) {
         Optional<Post> post = postRepository.findById(id);
         if(post.isEmpty())
             throw new RuntimeException("Post not found");
@@ -72,16 +67,17 @@ public class PostService {
                 attachmentService.deleteById(foundAttachment);
             }
         }
-
-
-        if(files != null && files.length > 0) {
-            for (MultipartFile file : files){
-                attachmentService.savePostWithAttachment(postToUpdate, file);
-            }
-            postToUpdate.setAttachments(attachmentService.findByPost(postToUpdate));
+        if (files != null && files.length > 0) {
+            saveMultipartFiles(files, postToUpdate);
         }
+        return postRepository.save(postToUpdate);
+    }
 
-        postRepository.save(postToUpdate);
+    private void saveMultipartFiles(MultipartFile[] files, Post post) {
+        for (MultipartFile file : files) {
+            attachmentService.savePostWithAttachment(post, file);
+        }
+        post.setAttachments(attachmentService.findByPost(post));
     }
 
     private static Post convertToPost(PostDto postDto, Post post) {
