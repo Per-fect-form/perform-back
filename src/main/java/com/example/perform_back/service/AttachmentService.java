@@ -60,6 +60,7 @@ public class AttachmentService {
         return attachmentRepository.findByPost(savedPost);
     }
 
+
     public List<Attachment> findByReviewPost(ReviewPost savedReviewPost) {
         return attachmentRepository.findByReviewPost(savedReviewPost);
     }
@@ -76,12 +77,19 @@ public class AttachmentService {
         return ext.equals("mp4") || ext.equals("avi") || ext.equals("mov") || ext.equals("mkv") || ext.equals("wmv");
     }
 
-    public void deleteAllByReviewPost(ReviewPost reviewPost) {
-        List<Attachment> attachments = attachmentRepository.findByReviewPost(reviewPost);
-        for (Attachment attachment : attachments) {
+    public void deleteAllByPost(Post post) {
+        List<Attachment> attachments = attachmentRepository.findByPost(post);
+        for (Attachment attachment : attachments){
             deleteById(attachment);
         }
     }
+    public void deleteAllByReviewPost(ReviewPost reviewPost) {
+            List<Attachment> attachments = attachmentRepository.findByReviewPost(reviewPost);
+            for (Attachment attachment : attachments) {
+                deleteById(attachment);
+            }
+        }
+
     public void deleteById(Attachment attachment) {
         imageS3Service.deleteImage(attachment);
         attachmentRepository.deleteById(attachment.getId());

@@ -22,17 +22,14 @@ public class ReviewPostService {
 
     private final ReviewPostRepository reviewPostRepository;
     private final VoteRepository voteRepository;
-    private final ImageS3Service imageS3Service;
     private final AttachmentService attachmentService;
 
     @Autowired
     public ReviewPostService(ReviewPostRepository reviewPostRepository,
         VoteRepository voteRepository,
-        ImageS3Service imageS3Service,
         AttachmentService attachmentService) {
         this.reviewPostRepository = reviewPostRepository;
         this.voteRepository = voteRepository;
-        this.imageS3Service = imageS3Service;
         this.attachmentService = attachmentService;
     }
     public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files) throws Exception {
@@ -47,6 +44,7 @@ public class ReviewPostService {
             saveMultipartFiles(files, reviewPostToSave);
         } else if (files == null) throw new IllegalArgumentException("No files");
         return reviewPostToSave;
+
     }
     public ReviewPost getReviewPostById(Long id) throws NoSuchElementException {
         Optional<ReviewPost> reviewPost = reviewPostRepository.findById(id);
