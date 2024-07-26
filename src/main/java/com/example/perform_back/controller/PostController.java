@@ -29,8 +29,8 @@ public class PostController {
     }
 
     @PostMapping("/upload")
-    public Post createPost(@RequestPart("post") PostDto post, @RequestPart(value = "file", required = false) MultipartFile file) {
-        return this.postService.save(post, file);
+    public Post createPost(@RequestPart("post") PostDto post, @RequestPart(value = "files", required = false) MultipartFile[] files) {
+        return this.postService.save(post, files);
     }
 
     @GetMapping("/{id}")
@@ -46,8 +46,8 @@ public class PostController {
     @PutMapping("/{id}")
     public void updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
                                @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
-                               @RequestPart(value = "file", required = false) MultipartFile file) {
-        this.postService.updateById(id, postDto, attachmentsDto, file);
+                               @RequestPart(value = "files", required = false) MultipartFile[] files) {
+        this.postService.updateById(id, postDto, attachmentsDto, files);
     }
 
 }
