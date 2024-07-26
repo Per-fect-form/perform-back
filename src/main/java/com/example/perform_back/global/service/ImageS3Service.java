@@ -1,6 +1,7 @@
 package com.example.perform_back.global.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.perform_back.entity.Attachment;
@@ -51,5 +52,12 @@ public class ImageS3Service {
         String originName = image.getOriginalFilename();
         String storedImagePath = uploadImageToS3(image);
         return new Attachment(originName, storedImagePath);
+    }
+
+    public void deleteImage(Attachment attachment) {
+        String url = attachment.getPath();
+        String splitStr = ".com/";
+        String fileName = url.substring(url.lastIndexOf(splitStr) + splitStr.length());
+        amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
     }
 }
