@@ -11,8 +11,8 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attachment_id")
     private Long id;
-    String name;
-    String path;
+    private String name;
+    private String path;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

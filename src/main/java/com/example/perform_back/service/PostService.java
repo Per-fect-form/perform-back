@@ -1,9 +1,10 @@
 package com.example.perform_back.service;
 
+import com.example.perform_back.dto.AttachmentDto;
+import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Attachment;
 import com.example.perform_back.entity.Post;
-import com.example.perform_back.repository.AttachmentRepository;
 import com.example.perform_back.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,12 +30,8 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public Post save(PostDto dto, MultipartFile file) {
-        Post post = new Post();
-        post.setTitle(dto.getTitle());
-        post.setCategory(dto.getCategory());
-        post.setContent(dto.getContent());
-        post.setCreatedDate(new Date());
+    public Post save(PostDto postDto, MultipartFile file) {
+        Post post = convertToPost(postDto, new Post());
         Post savedPost = postRepository.save(post);
         if (file != null) {
             attachmentService.savePostWithAttachment(post, file);
@@ -56,7 +53,33 @@ public class PostService {
          Optional<Post> post = postRepository.findById(id);
          if(post.isEmpty())
              throw new RuntimeException("Post not found");
-         attachmentService.deleteByPost(post.get());
+         attachmentService.deleteAllByPost(post.get());
          postRepository.delete(post.get());
+    }
+
+    public void updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile file) {
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isEmpty())
+            throw new RuntimeException("Post not found");
+        Post postToUpdate = convertToPost(postDto, post.get());
+
+        for(AttachmentDto attachment : attachmentsDto.getAttachments()) {
+            Attachment foundAttachment = attachmentService.findById(attachment.getId());
+            attachmentService.deleteById(foundAttachment);
+        }
+        if(file != null) {
+            attachmentService.savePostWithAttachment(postToUpdate, file);
+            postToUpdate.setAttachments(attachmentService.findByPost(postToUpdate));
+        }
+
+        postRepository.save(postToUpdate);
+    }
+
+    private static Post convertToPost(PostDto postDto, Post post) {
+        post.setTitle(postDto.getTitle());
+        post.setCategory(postDto.getCategory());
+        post.setContent(postDto.getContent());
+        post.setCreatedDate(new Date());
+        return post;
     }
 }
