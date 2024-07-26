@@ -30,15 +30,13 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public Post save(PostDto postDto, MultipartFile file) {
-        Post post = convertToPost(postDto, new Post());
-        Post savedPost = postRepository.save(post);
-        if (file != null) {
-            attachmentService.savePostWithAttachment(post, file);
-            savedPost.setAttachments(attachmentService.findByPost(savedPost));
+    public Post save(PostDto postDto, MultipartFile[] files) {
+        Post postToSave = convertToPost(postDto, new Post());
+        postToSave = postRepository.save(postToSave);
+        if (files != null && files.length > 0) {
+            saveMultipartFiles(files, postToSave);
         }
-
-        return savedPost;
+        return postToSave;
     }
 
     public Post findById(Long id) {
@@ -57,22 +55,29 @@ public class PostService {
          postRepository.delete(post.get());
     }
 
-    public void updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile file) {
+    public Post updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files) {
         Optional<Post> post = postRepository.findById(id);
         if(post.isEmpty())
             throw new RuntimeException("Post not found");
         Post postToUpdate = convertToPost(postDto, post.get());
 
-        for(AttachmentDto attachment : attachmentsDto.getAttachments()) {
-            Attachment foundAttachment = attachmentService.findById(attachment.getId());
-            attachmentService.deleteById(foundAttachment);
+        if(attachmentsDto != null) {
+            for(AttachmentDto attachment : attachmentsDto.getAttachments()) {
+                Attachment foundAttachment = attachmentService.findById(attachment.getId());
+                attachmentService.deleteById(foundAttachment);
+            }
         }
-        if(file != null) {
-            attachmentService.savePostWithAttachment(postToUpdate, file);
-            postToUpdate.setAttachments(attachmentService.findByPost(postToUpdate));
+        if (files != null && files.length > 0) {
+            saveMultipartFiles(files, postToUpdate);
         }
+        return postRepository.save(postToUpdate);
+    }
 
-        postRepository.save(postToUpdate);
+    private void saveMultipartFiles(MultipartFile[] files, Post post) {
+        for (MultipartFile file : files) {
+            attachmentService.savePostWithAttachment(post, file);
+        }
+        post.setAttachments(attachmentService.findByPost(post));
     }
 
     private static Post convertToPost(PostDto postDto, Post post) {
