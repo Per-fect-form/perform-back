@@ -1,11 +1,16 @@
 package com.example.perform_back.service;
 
+import com.example.perform_back.dto.PostDto;
+import com.example.perform_back.dto.ReviewPostDto;
 import com.example.perform_back.entity.Attachment;
+import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.entity.Vote;
 import com.example.perform_back.global.service.ImageS3Service;
 import com.example.perform_back.repository.ReviewPostRepository;
 import com.example.perform_back.repository.VoteRepository;
+import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,21 +32,47 @@ public class ReviewPostService {
         this.voteRepository = voteRepository;
         this.attachmentService = attachmentService;
     }
-    public void createReviewPost(String title, String content, MultipartFile file) {
+    public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files) throws Exception {
 
         Vote vote = new Vote();
         voteRepository.save(vote);
 
-        ReviewPost reviewPost = new ReviewPost(title, content);
-        reviewPost.setVote(vote);
-        reviewPostRepository.save(reviewPost);
+        ReviewPost reviewPostToSave = convertToPost(reviewPostDto, new ReviewPost());
+        reviewPostToSave = reviewPostRepository.save(reviewPostToSave);
+        reviewPostToSave.setVote(vote);
+        if (files != null && files.length > 0) {
+            saveMultipartFiles(files, reviewPostToSave);
+        } else if (files == null) throw new IllegalArgumentException("No files");
+        return reviewPostToSave;
 
-        Attachment attachment = attachmentService.save(file);
-        attachment.setReviewPost(reviewPost);
     }
     public ReviewPost getReviewPostById(Long id) throws NoSuchElementException {
-        Optional<ReviewPost> rp = reviewPostRepository.findById(id);
-        if (rp.isEmpty()) throw new IllegalArgumentException("게시물이 존재하지 않습니다");
-        return rp.get();
+        Optional<ReviewPost> reviewPost = reviewPostRepository.findById(id);
+        if (reviewPost.isEmpty()) throw new IllegalArgumentException("Post not found");
+        return reviewPost.get();
+    }
+
+    public List<ReviewPost> getAllReviewPost() {
+        return reviewPostRepository.findAll();
+    }
+
+    public void deleteReviewPostById(Long id) {
+        Optional<ReviewPost> reviewPost = reviewPostRepository.findById(id);
+        if (reviewPost.isEmpty()) throw new IllegalArgumentException("Post not found");
+        attachmentService.deleteAllByReviewPost(reviewPost.get());
+        reviewPostRepository.deleteById(id);
+    }
+    private void saveMultipartFiles(MultipartFile[] files, ReviewPost reviewPost) {
+        for (MultipartFile file : files) {
+            attachmentService.savePostWithAttachment(reviewPost, file);
+        }
+        reviewPost.setAttachments(attachmentService.findByReviewPost(reviewPost));
+    }
+
+    private static ReviewPost convertToPost(ReviewPostDto reviewPostDto, ReviewPost reviewPost) {
+        reviewPost.setTitle(reviewPostDto.getTitle());
+        reviewPost.setContent(reviewPostDto.getContent());
+        reviewPost.setCreatedDate(new Date());
+        return reviewPost;
     }
 }

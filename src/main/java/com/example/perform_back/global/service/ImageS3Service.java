@@ -56,9 +56,9 @@ public class ImageS3Service {
     }
 
     public void deleteImage(Attachment attachment) {
-            String url = attachment.getPath();
-            String splitStr = ".com/";
-            String fileName = url.substring(url.lastIndexOf(splitStr) + splitStr.length());
-            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+        String url = attachment.getPath();
+        String splitStr = ".com/";
+        String fileName = url.substring(url.lastIndexOf(splitStr) + splitStr.length());
+        amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
     }
 }

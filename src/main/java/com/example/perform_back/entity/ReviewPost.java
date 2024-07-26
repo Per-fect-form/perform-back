@@ -1,17 +1,24 @@
 package com.example.perform_back.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "review_post")
 @Data
-@NoArgsConstructor
 public class ReviewPost {
 
     @Id
@@ -22,7 +29,7 @@ public class ReviewPost {
     @JoinColumn(name = "vote_id")
     @JsonManagedReference
     private Vote vote;
-    private String reviewStatus; //�ɻ� ��, �հ�, ���հ�
+    private String reviewStatus;
     private String title;
     private String content;
     @Temporal(TemporalType.TIMESTAMP)
@@ -33,9 +40,7 @@ public class ReviewPost {
     private List<Attachment> attachments;
 
 
-    public ReviewPost(String title, String content) {
-        this.title = title;
-        this.content = content;
+    public ReviewPost() {
         this.reviewStatus = "under review";
         this.createdDate = new Date();
     }

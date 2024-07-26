@@ -1,18 +1,22 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.ReviewPostDto;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.service.ReviewPostService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,16 +32,28 @@ public class ReviewPostController {
         this.reviewPostService = reviewPostService;
     }
 
-    @PostMapping("/upload")
-    public void createReviewPost(@RequestParam("title") String title,
-        @RequestParam("content") String content,
-        @RequestParam("file")MultipartFile file) {
-        reviewPostService.createReviewPost(title, content, file);
+    @Operation(summary = "전체 심사 게시글 조회")
+    @GetMapping
+    public List<ReviewPost> getAllReviewPost() {
+        return this.reviewPostService.getAllReviewPost();
     }
 
+    @Operation(summary = "심사 게시글 업로드")
+    @PostMapping("/upload")
+    public ReviewPost createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPost,
+                                       @RequestPart("file") MultipartFile[] files) throws Exception {
+        return this.reviewPostService.createReviewPost(reviewPost, files);
+    }
+
+    @Operation(summary = "특정 심사 게시글 조회")
     @GetMapping("/{id}")
     public ReviewPost getReviewPostById(@PathVariable Long id) {
         return reviewPostService.getReviewPostById(id);
     }
 
+    @Operation(summary = "특정 심사 게시글 삭제")
+    @DeleteMapping("/{id}")
+    public void deleteReviewPostById(@PathVariable Long id) {
+        reviewPostService.deleteReviewPostById(id);
+    }
 }

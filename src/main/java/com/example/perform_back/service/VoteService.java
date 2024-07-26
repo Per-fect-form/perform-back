@@ -24,29 +24,29 @@ public class VoteService {
 
     @Transactional
     public void agree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("�ش� ���̵��� �ɻ�Խù��� �������� �ʽ��ϴ�"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Can't find post by id"));
         vote.setAgreeNum(vote.getAgreeNum() + 1);
         voteRepository.save(vote);
     }
 
     @Transactional
     public void disagree(Long voteId) {
-        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("�ش� ���̵��� �ɻ�Խù��� �������� �ʽ��ϴ�"));
+        Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new IllegalArgumentException("Can't find post by id"));
         vote.setDisagreeNum(vote.getDisagreeNum() + 1);
         voteRepository.save(vote);
     }
-    @Scheduled(cron = "0 0 * * * *") // �� �ð����� ����, �� �� �� �� �� ����
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void updateReviewStatuses() {
         Date now = new Date();
-        List<Vote> votes = voteRepository.findAll(); //��ǥ ��ü�� ����Ʈ�� ��������
+        List<Vote> votes = voteRepository.findAll();
 
-        for (Vote vote : votes) { //�ϳ��� �˻�
-            if (vote.getDueDate().before(now)) { //���������� ��������
+        for (Vote vote : votes) {
+            if (vote.getDueDate().before(now)) {
                 ReviewPost reviewPost = vote.getReviewPost();
-                //���� ���
+
                 int totalVotes = vote.getAgreeNum() + vote.getDisagreeNum();
-                if (totalVotes > 0 && ((double) vote.getAgreeNum() / totalVotes) >= 0.7) { //��ü ��ǥ ���� ���� �� ���� ���� ����
+                if (totalVotes > 0 && ((double) vote.getAgreeNum() / totalVotes) >= 0.7) {
                     reviewPost.setReviewStatus("pass");
                 } else {
                     reviewPost.setReviewStatus("non_pass");
