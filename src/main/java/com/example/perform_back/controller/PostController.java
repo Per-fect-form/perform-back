@@ -1,5 +1,6 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.service.PostService;
@@ -40,6 +41,13 @@ public class PostController {
     @DeleteMapping("/{id}")
     public void deletePostById(@PathVariable Long id) {
         this.postService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public void updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
+                               @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
+                               @RequestPart(value = "file", required = false) MultipartFile file) {
+        this.postService.updateById(id, postDto, attachmentsDto, file);
     }
 
 }
