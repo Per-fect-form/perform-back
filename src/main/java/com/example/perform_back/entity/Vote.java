@@ -35,9 +35,6 @@ public class Vote {
     public Vote() {
 
         this.createdDate = new Date();
-
-        this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
-
         //this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); 
         this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
 
