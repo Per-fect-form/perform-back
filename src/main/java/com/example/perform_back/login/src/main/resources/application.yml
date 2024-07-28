@@ -1,0 +1,4 @@
+kakao:
+  client_id: 7f97073caaa0a3875bd886c50f467b2a
+  client_secret: qbwgRwgQyr9ZqNmq8GP9Uz4flFLolGBH
+  redirect_uri: http://localhost:8080/callback
