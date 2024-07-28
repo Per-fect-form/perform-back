@@ -41,7 +41,6 @@ public class ReviewPost {
     @JsonManagedReference
     private List<Attachment> attachments;
 
-
     public ReviewPost() {
         this.reviewStatus = "under review";
         this.createdDate = new Date();
