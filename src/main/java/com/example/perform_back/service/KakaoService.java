@@ -1,8 +1,8 @@
-package com.example.perform_back.login.src.main.java.com.kakaologin.demo.service;
+package com.example.perform_back.service;
 
+import com.example.perform_back.dto.KakaoUserInfoResponseDto;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.kakaologin.demo.dto.KakaoUserInfoResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

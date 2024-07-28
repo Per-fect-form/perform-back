@@ -1,4 +1,4 @@
-package com.example.perform_back.login.src.main.java.com.kakaologin.demo.controller;
+package com.example.perform_back.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
