@@ -1,4 +1,4 @@
-package com.example.perform_back.login.src.main.java.com.kakaologin.demo.dto;
+package com.example.perform_back.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

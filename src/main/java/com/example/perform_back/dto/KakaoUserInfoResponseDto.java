@@ -1,4 +1,4 @@
-package com.example.perform_back.login.src.main.java.com.kakaologin.demo.dto;
+package com.example.perform_back.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
