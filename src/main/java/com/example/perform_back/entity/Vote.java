@@ -1,6 +1,7 @@
 package com.example.perform_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,8 +25,10 @@ public class Vote {
     private Integer agreeNum = 0;
     private Integer disagreeNum = 0;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
     private Date createdDate;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
     private Date dueDate;
 
     @OneToOne(mappedBy = "vote")
@@ -35,9 +38,6 @@ public class Vote {
     public Vote() {
 
         this.createdDate = new Date();
-
-        this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
-
         //this.dueDate = new Date(System.currentTimeMillis() + 1L * 60 * 1000); 
         this.dueDate = new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000);
 

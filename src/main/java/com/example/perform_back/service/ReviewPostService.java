@@ -1,12 +1,8 @@
 package com.example.perform_back.service;
 
-import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.dto.ReviewPostDto;
-import com.example.perform_back.entity.Attachment;
-import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.entity.Vote;
-import com.example.perform_back.global.service.ImageS3Service;
 import com.example.perform_back.repository.ReviewPostRepository;
 import com.example.perform_back.repository.VoteRepository;
 import java.util.Date;
@@ -26,8 +22,8 @@ public class ReviewPostService {
 
     @Autowired
     public ReviewPostService(ReviewPostRepository reviewPostRepository,
-        VoteRepository voteRepository,
-        AttachmentService attachmentService) {
+                             VoteRepository voteRepository,
+                             AttachmentService attachmentService) {
         this.reviewPostRepository = reviewPostRepository;
         this.voteRepository = voteRepository;
         this.attachmentService = attachmentService;
