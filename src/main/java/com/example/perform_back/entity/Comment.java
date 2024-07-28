@@ -1,6 +1,7 @@
 package com.example.perform_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Date;
@@ -14,6 +15,7 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
     private String content;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
     private Date createdDate;
 
     @ManyToOne

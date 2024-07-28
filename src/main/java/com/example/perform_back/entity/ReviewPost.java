@@ -1,5 +1,6 @@
 package com.example.perform_back.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,12 +34,12 @@ public class ReviewPost {
     private String title;
     private String content;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
     private Date createdDate;
 
     @OneToMany(mappedBy = "reviewPost")
     @JsonManagedReference
     private List<Attachment> attachments;
-
 
     public ReviewPost() {
         this.reviewStatus = "under review";
