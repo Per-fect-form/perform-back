@@ -2,23 +2,20 @@ package com.example.perform_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Data
-public class Post {
+public class Likes {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "likes_id")
     private Long id;
-    private String title;
-    private String content;
-    private String category;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
     private Date createdDate;
 
@@ -27,18 +24,18 @@ public class Post {
     @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "post")
-    @JsonManagedReference
-    private List<Attachment> attachments;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    @JsonBackReference
+    private Post post;
 
-    @OneToMany(mappedBy = "post")
-    @JsonManagedReference
-    private List<Comment> comments;
+    @ManyToOne
+    @JoinColumn(name = "review_post_id")
+    @JsonBackReference
+    private ReviewPost reviewPost;
 
-    @OneToMany(mappedBy = "post")
-    @JsonManagedReference
-    private List<Likes> likes;
-
-    public Post() {}
-
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
+    @JsonBackReference
+    private Comment comment;
 }
