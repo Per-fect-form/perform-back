@@ -41,6 +41,10 @@ public class ReviewPost {
     @JsonManagedReference
     private List<Attachment> attachments;
 
+    @OneToMany(mappedBy = "reviewPost")
+    @JsonManagedReference
+    private List<Likes> likes;
+
     public ReviewPost() {
         this.reviewStatus = "under review";
         this.createdDate = new Date();

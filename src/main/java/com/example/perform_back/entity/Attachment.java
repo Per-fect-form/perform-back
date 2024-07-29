@@ -24,8 +24,6 @@ public class Attachment {
     @JsonBackReference
     private ReviewPost reviewPost;
 
-
-
     public Attachment(String name, String path) {
         this.name = name;
         this.path = path;

@@ -2,11 +2,9 @@ package com.example.perform_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +34,10 @@ public class Post {
     @OneToMany(mappedBy = "post")
     @JsonManagedReference
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "post")
+    @JsonManagedReference
+    private List<Likes> likes;
 
     public Post() {}
 
