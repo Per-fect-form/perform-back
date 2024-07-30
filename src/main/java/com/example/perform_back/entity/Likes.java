@@ -17,7 +17,7 @@ public class Likes {
     private Long id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "Asia/Seoul")
-    private Date createdDate;
+    private Date likedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
