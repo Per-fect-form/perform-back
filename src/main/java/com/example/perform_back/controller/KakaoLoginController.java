@@ -1,6 +1,8 @@
 package com.example.perform_back.controller;
 
 import com.example.perform_back.dto.KakaoInfoDto;
+import com.example.perform_back.dto.KakaoLoginDto;
+import com.example.perform_back.dto.KakaoUserInfoResponseDto;
 import com.example.perform_back.service.KakaoService;
 import com.example.perform_back.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,44 +32,35 @@ public class KakaoLoginController {
     private final UserService userService;
 
     @GetMapping("/callback")
-    public String callback(@RequestParam("code") String code, HttpSession session, Model model) {
-        log.info(code);
+    public String callback(@RequestParam("code") String code, HttpSession session, Model model) throws JsonProcessingException {
+
         String accessToken = null;
         try {
-            accessToken = kakaoService.getAccessToken(code);
+            accessToken = kakaoService.getAccessTokenFromKakao(code);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("엑세스 토큰  " + accessToken);
 
-//        String accessToken = kakaoService.getAccessTokenFromKakao(code);
-
-//        log.info(accessToken);
-
-        KakaoInfoDto kakaoInfoDto = null;
+        KakaoInfoDto userInfo = null;
         try {
-            kakaoInfoDto = kakaoService.getKakaoInfo(accessToken);
+            userInfo = kakaoService.getUserInfo(accessToken);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("이메일 확인 " + kakaoInfoDto.getEmail());
 
-
-        session.setAttribute("loginMember", kakaoInfoDto);
-        // session.setMaxInactiveInterval( ) : 세션 타임아웃을 설정하는 메서드
-        // 로그인 유지 시간 설정 (1800초 == 30분)
-        session.setMaxInactiveInterval(60 * 30);
-        // 로그아웃 시 사용할 카카오토큰 추가
-        session.setAttribute("kakaoToken", accessToken);
-
-//        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
-
-        userService.saveOrUpdateUser(userInfo.getId(), userInfo.getKakaoAccount().getProfile().getNickName(),
-                userInfo.getKakaoAccount().getProfile().getProfileImageUrl(), userInfo.getKakaoAccount().getEmail());
 //      User 로그인, 또는 회원가입 로직 추가
+        Long id = userInfo.getId();
+        String nickname = userInfo.getNickname();
+        String profileImageUrl = userInfo.getProfileImageUrl();
+        String email = userInfo.getEmail();
+        userService.saveOrUpdateUser(id, nickname, profileImageUrl, email);
 
-//      return new ResponseEntity<>(HttpStatus.OK);
+        System.out.println("AccessToken: " + accessToken);
+        System.out.println("Email: " + userInfo.getEmail());
 
+        session.setMaxInactiveInterval(60 * 30);    // 로그인 유지 시간 30분
+        session.setAttribute("kakaoToken", accessToken);    // 로그아웃을 위한 kakaoToken session
+        // 로그인 성공 후 리다이렉트 테스트
         String location = "https://kauth.kakao.com/oauth/logout?client_id=" + restApi_key + "&logout_redirect_uri=" + logout_uri;
         model.addAttribute("location", location);
         return "mypage";
@@ -79,7 +72,8 @@ public class KakaoLoginController {
 
         if (accessToken != null && !accessToken.isEmpty()) {
             try {
-                kakaoService.kakaoDisconnect(accessToken);
+                Long id =kakaoService.kakaoDisconnect(accessToken);
+                System.out.println("반환된 id: "+id);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

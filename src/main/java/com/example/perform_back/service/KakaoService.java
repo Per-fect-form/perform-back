@@ -5,8 +5,7 @@ import com.example.perform_back.dto.KakaoUserInfoResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -16,31 +15,21 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class KakaoService {
 
     private final UserService userService;
+    @Value("${kakao.client_id}")
     private String clientId;
+    @Value("${kakao.client_secret}")
     private String clientSecret;
+    @Value("${kakao.redirect_uri}")
     private String redirectUri;
 
-    public KakaoService(@Value("${kakao.client_id}") String clientId,
-                        @Value("${kakao.client_secret}") String clientSecret,
-                        @Value("${kakao.redirect_uri}") String redirectUri, UserService userService) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
-        this.userService = userService;
-    }
-
-    public String getAccessToken(String code) throws JsonProcessingException {
+    // 토큰 발급
+    public String getAccessTokenFromKakao(String code) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -68,129 +57,25 @@ public class KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-        return jsonNode.get("access_token").asText();
-    }
+        String tokenType = jsonNode.get("token_type").asText();
+        String accessToken = jsonNode.get("access_token").asText();
+        int expiresIn = jsonNode.get("expires_in").asInt();
+        String refreshToken = jsonNode.get("refresh_token").asText();
+        int refreshTokenExpiresIn = jsonNode.get("refresh_token_expires_in").asInt();
 
-    //토큰 발급
-    public String getAccessTokenFromKakao(String code) {
-        String accessToken = "";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
-
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            StringBuilder sb = new StringBuilder();
-            sb.append("grant_type=authorization_code");
-            sb.append("&client_id=").append(clientId);
-            sb.append("&client_secret=").append(clientSecret);
-            sb.append("&redirect_uri=").append(redirectUri);
-            sb.append("&code=").append(code);
-            writer.write(sb.toString());
-            writer.flush();
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder result = new StringBuilder();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-            System.out.println("response body : " + result);
-
-            JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result.toString());
-
-            // 응답을 파싱하여 각 필드에 저장
-            String tokenType = element.getAsJsonObject().get("token_type").getAsString();
-            accessToken = element.getAsJsonObject().get("access_token").getAsString();
-            int expiresIn = element.getAsJsonObject().get("expires_in").getAsInt();
-            String refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
-            int refreshTokenExpiresIn = element.getAsJsonObject().get("refresh_token_expires_in").getAsInt();
-
-            // 각 필드 출력
-            System.out.println("token_type ------------->: " + tokenType);
-            System.out.println("access_token ------------->: " + accessToken);
-            System.out.println("expires_in ------------->: " + expiresIn);
-            System.out.println("refresh_token ------------->: " + refreshToken);
-            System.out.println("refresh_token_expires_in ------------->: " + refreshTokenExpiresIn);
-
-            br.close();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        System.out.println("tokenType: " + tokenType);
+        System.out.println("accessToken: " + accessToken);
+        System.out.println("expiresIn: " + expiresIn);
+        System.out.println("refreshToken: " + refreshToken);
+        System.out.println("refreshTokenExpiresIn: " + refreshTokenExpiresIn);
 
         return accessToken;
     }
 
     //사용자 정보 가져오기
-    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
-        KakaoUserInfoResponseDto userInfo = null;
+    public KakaoInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
+        KakaoInfoDto userInfo = null;
 
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder result = new StringBuilder();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-            System.out.println("response body : " + result);
-
-            JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result.toString());
-
-            userInfo = new KakaoUserInfoResponseDto();
-            userInfo.id = element.getAsJsonObject().get("id").getAsLong();
-
-            JsonElement kakaoAccountElement = element.getAsJsonObject().get("kakao_account");
-            JsonElement profileElement = kakaoAccountElement.getAsJsonObject().get("profile");
-
-            KakaoUserInfoResponseDto.KakaoAccount kakaoAccount = userInfo.new KakaoAccount();
-            KakaoUserInfoResponseDto.KakaoAccount.Profile profile = kakaoAccount.new Profile();
-            profile.nickName = profileElement.getAsJsonObject().get("nickname").getAsString();
-            profile.profileImageUrl = profileElement.getAsJsonObject().get("profile_image_url").getAsString();
-            kakaoAccount.profile = profile;
-
-            if (kakaoAccountElement.getAsJsonObject().has("email")) {
-                kakaoAccount.email = kakaoAccountElement.getAsJsonObject().get("email").getAsString();
-            }
-
-            userInfo.kakaoAccount = kakaoAccount;
-
-            System.out.println("User ID : " + userInfo.getId());
-            System.out.println("NickName : " + userInfo.getKakaoAccount().getProfile().getNickName());
-            System.out.println("ProfileImageUrl : " + userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
-            System.out.println("Email : " + userInfo.getKakaoAccount().getEmail());
-
-            br.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return userInfo;
-    }
-
-    public KakaoInfoDto getKakaoInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -213,10 +98,16 @@ public class KakaoService {
 
         Long id = jsonNode.get("id").asLong();
         String email = jsonNode.get("kakao_account").get("email").asText();
-        String nickname = jsonNode.get("properties")
-                .get("nickname").asText();
+        String nickname = jsonNode.path("kakao_account").path("profile").path("nickname").asText();
+        String profileImageUrl = jsonNode.path("kakao_account").path("profile").path("profile_image_url").asText();
 
-        return new KakaoInfoDto(id, nickname, email);
+        System.out.println("User ID : " + id);
+        System.out.println("NickName : " + nickname);
+        System.out.println("ProfileImageUrl : " + profileImageUrl);
+        System.out.println("Email : " + email);
+
+        userInfo = new KakaoInfoDto(id, nickname, email, profileImageUrl);
+        return userInfo;
     }
 
     public Long kakaoDisconnect(String accessToken) throws JsonProcessingException {
@@ -252,9 +143,7 @@ public class KakaoService {
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
-        System.out.println("반환된 id: " + id);
-        return id;
+        return jsonNode.get("id").asLong();
     }
 
 }
