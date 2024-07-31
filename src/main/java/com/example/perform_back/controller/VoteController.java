@@ -1,10 +1,14 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.entity.UserVote;
+import com.example.perform_back.service.UserVoteService;
 import com.example.perform_back.service.VoteService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,15 +21,5 @@ public class VoteController {
 
     public VoteController(VoteService voteService) {
         this.voteService = voteService;
-    }
-
-    @PatchMapping("/{voteId}/agree")
-    public void agree(@PathVariable Long voteId) {
-        voteService.agree(voteId);
-    }
-
-    @PatchMapping("/{voteId}/disagree")
-    public void disagree(@PathVariable Long voteId) {
-        voteService.disagree(voteId);
     }
 }

@@ -28,18 +28,17 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
+    private List<ReviewPost> reviewPosts;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private List<Likes> likes;
-
-    // 사용자가 수신한 알림 목록
+    private List<UserVote> userVotes;
+    
     @OneToMany(mappedBy = "user")
-    private List<Notification> receivedNotifications;
-
-    // 사용자가 생성한 알림 목록
-    @OneToMany(mappedBy = "actionUser")
-    private List<Notification> createdNotifications;
-
+    @JsonManagedReference
+    private List<Likes> likes;
 }

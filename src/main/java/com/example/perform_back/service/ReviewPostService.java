@@ -2,8 +2,10 @@ package com.example.perform_back.service;
 
 import com.example.perform_back.dto.ReviewPostDto;
 import com.example.perform_back.entity.ReviewPost;
+import com.example.perform_back.entity.User;
 import com.example.perform_back.entity.Vote;
 import com.example.perform_back.repository.ReviewPostRepository;
+import com.example.perform_back.repository.UserRepository;
 import com.example.perform_back.repository.VoteRepository;
 import java.util.Date;
 import java.util.List;
@@ -19,16 +21,20 @@ public class ReviewPostService {
     private final ReviewPostRepository reviewPostRepository;
     private final VoteRepository voteRepository;
     private final AttachmentService attachmentService;
+    private final UserRepository userRepository;
 
     @Autowired
     public ReviewPostService(ReviewPostRepository reviewPostRepository,
-        VoteRepository voteRepository,
-        AttachmentService attachmentService) {
+                             VoteRepository voteRepository,
+                             AttachmentService attachmentService, UserRepository userRepository) {
         this.reviewPostRepository = reviewPostRepository;
         this.voteRepository = voteRepository;
         this.attachmentService = attachmentService;
+        this.userRepository = userRepository;
     }
     public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files) throws Exception {
+
+        //User user = userRepository.findById(userId).get();
 
         Vote vote = new Vote();
         voteRepository.save(vote);
@@ -36,6 +42,7 @@ public class ReviewPostService {
         ReviewPost reviewPostToSave = convertToPost(reviewPostDto, new ReviewPost());
         reviewPostToSave = reviewPostRepository.save(reviewPostToSave);
         reviewPostToSave.setVote(vote);
+        //reviewPostToSave.setUser(user);
         if (files != null && files.length > 0) {
             saveMultipartFiles(files, reviewPostToSave);
         } else if (files == null) throw new IllegalArgumentException("No files");
@@ -48,7 +55,7 @@ public class ReviewPostService {
         return reviewPost.get();
     }
 
-    public List<ReviewPost> getAllReviewPost() {
+    public List<ReviewPost> getAllReviewPosts() {
         return reviewPostRepository.findAll();
     }
 
@@ -70,5 +77,26 @@ public class ReviewPostService {
         reviewPost.setContent(reviewPostDto.getContent());
         reviewPost.setCreatedDate(new Date());
         return reviewPost;
+    }
+
+    public List<ReviewPost> getReviewPostByTitle(String title) {
+        return reviewPostRepository.findByTitleContaining(title);
+    }
+
+    public ReviewPost updateReviewPostById(Long id, ReviewPostDto reviewPost, MultipartFile[] files) {
+        ReviewPost temp = reviewPostRepository.findById(id).get();
+        if ((temp.getVote().getAgreeNum() + temp.getVote().getAgreeNum()) == 0) {
+
+            temp.setContent(reviewPost.getContent());
+            temp.setCreatedDate(new Date());
+
+            attachmentService.deleteAllByReviewPost(temp);
+
+            if (files != null && files.length > 0) {
+                saveMultipartFiles(files, temp);
+            }
+            return reviewPostRepository.save(temp);
+        }
+        else throw new RuntimeException("Cannot upadate");
     }
 }
