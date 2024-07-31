@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.HashMap;
 
 @Getter
+@Setter
 @NoArgsConstructor //역직렬화를 위한 기본 생성자
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoUserInfoResponseDto {
@@ -43,6 +45,7 @@ public class KakaoUserInfoResponseDto {
     public Partner partner;
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public class KakaoAccount {
@@ -85,7 +88,6 @@ public class KakaoUserInfoResponseDto {
         @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public class Profile {
-
             //닉네임
             @JsonProperty("nickname")
             public String nickName;
