@@ -2,6 +2,7 @@ package com.example.perform_back.controller;
 
 import com.example.perform_back.dto.KakaoInfoDto;
 import com.example.perform_back.service.KakaoService;
+import com.example.perform_back.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class KakaoLoginController {
     private String logout_uri;
 
     private final KakaoService kakaoService;
+    private final UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam("code") String code, HttpSession session, Model model) {
@@ -60,13 +62,15 @@ public class KakaoLoginController {
 
 //        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
 
-        // User 로그인, 또는 회원가입 로직 추가
-//        return new ResponseEntity<>(HttpStatus.OK);
+        userService.saveOrUpdateUser(userInfo.getId(), userInfo.getKakaoAccount().getProfile().getNickName(),
+                userInfo.getKakaoAccount().getProfile().getProfileImageUrl(), userInfo.getKakaoAccount().getEmail());
+//      User 로그인, 또는 회원가입 로직 추가
+
+//      return new ResponseEntity<>(HttpStatus.OK);
 
         String location = "https://kauth.kakao.com/oauth/logout?client_id=" + restApi_key + "&logout_redirect_uri=" + logout_uri;
         model.addAttribute("location", location);
         return "mypage";
-//        return "redirect:/";
     }
 
     @GetMapping("/logout")

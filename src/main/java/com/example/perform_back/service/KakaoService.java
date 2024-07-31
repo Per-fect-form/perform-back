@@ -71,6 +71,7 @@ public class KakaoService {
         return jsonNode.get("access_token").asText();
     }
 
+    //토큰 발급
     public String getAccessTokenFromKakao(String code) {
         String accessToken = "";
         String reqURL = "https://kauth.kakao.com/oauth/token";
@@ -107,9 +108,19 @@ public class KakaoService {
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(result.toString());
 
+            // 응답을 파싱하여 각 필드에 저장
+            String tokenType = element.getAsJsonObject().get("token_type").getAsString();
             accessToken = element.getAsJsonObject().get("access_token").getAsString();
+            int expiresIn = element.getAsJsonObject().get("expires_in").getAsInt();
+            String refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
+            int refreshTokenExpiresIn = element.getAsJsonObject().get("refresh_token_expires_in").getAsInt();
 
-            System.out.println("access_token : " + accessToken);
+            // 각 필드 출력
+            System.out.println("token_type ------------->: " + tokenType);
+            System.out.println("access_token ------------->: " + accessToken);
+            System.out.println("expires_in ------------->: " + expiresIn);
+            System.out.println("refresh_token ------------->: " + refreshToken);
+            System.out.println("refresh_token_expires_in ------------->: " + refreshTokenExpiresIn);
 
             br.close();
             writer.close();
@@ -120,6 +131,7 @@ public class KakaoService {
         return accessToken;
     }
 
+    //사용자 정보 가져오기
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
         String reqURL = "https://kapi.kakao.com/v2/user/me";
         KakaoUserInfoResponseDto userInfo = null;
@@ -158,11 +170,17 @@ public class KakaoService {
             profile.nickName = profileElement.getAsJsonObject().get("nickname").getAsString();
             profile.profileImageUrl = profileElement.getAsJsonObject().get("profile_image_url").getAsString();
             kakaoAccount.profile = profile;
+
+            if (kakaoAccountElement.getAsJsonObject().has("email")) {
+                kakaoAccount.email = kakaoAccountElement.getAsJsonObject().get("email").getAsString();
+            }
+
             userInfo.kakaoAccount = kakaoAccount;
 
             System.out.println("User ID : " + userInfo.getId());
             System.out.println("NickName : " + userInfo.getKakaoAccount().getProfile().getNickName());
             System.out.println("ProfileImageUrl : " + userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+            System.out.println("Email : " + userInfo.getKakaoAccount().getEmail());
 
             br.close();
         } catch (Exception e) {
