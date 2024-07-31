@@ -2,16 +2,16 @@ package com.example.perform_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data //lomboc 합친, 느낌 객체도 들어있음 ,,
 public class Comment {
-    //=포스트 객체 그대로, 포스트 아이디로 해당 게시물 찾고, setpost 해서 comment post 연결
-        //attachment랑 연결
-
+    // = 포스트 객체 그대로, 포스트 아이디로 해당 게시물 찾고, setpost 해서 comment post 연결
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
@@ -30,6 +30,10 @@ public class Comment {
     @JsonBackReference
     private User user;
 
+    @OneToMany(mappedBy = "comment")
+    @JsonManagedReference
+    private List<Likes> likes;
+
     public Comment() {}
 
     public void setPost(Post post) {
@@ -38,5 +42,4 @@ public class Comment {
             post.getComments().add(this);
         }
     }
-
 }
