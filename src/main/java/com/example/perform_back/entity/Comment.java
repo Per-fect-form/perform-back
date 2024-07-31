@@ -30,4 +30,13 @@ public class Comment {
     @JsonBackReference
     private User user;
 
-    
+    public Comment() {}
+
+    public void setPost(Post post) {
+        this.post = post;
+        if (!post.getComments().contains(this)){
+            post.getComments().add(this);
+        }
+    }
+
+}
