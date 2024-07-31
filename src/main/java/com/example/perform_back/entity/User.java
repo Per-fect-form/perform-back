@@ -37,4 +37,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<UserVote> userVotes;
+    
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Likes> likes;
 }

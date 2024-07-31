@@ -8,6 +8,7 @@ class PerformBackApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.println("Test");
 	}
 
 }

@@ -45,10 +45,15 @@ public class ReviewPost {
     @JsonManagedReference
     private List<Attachment> attachments;
 
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
+
+    @OneToMany(mappedBy = "reviewPost")
+    @JsonManagedReference
+    private List<Likes> likes;
 
     public ReviewPost() {
         this.reviewStatus = "under review";
