@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Data
 public class User {
+  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -28,10 +29,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
-    private List<Comment> comments;
-
-
-
+    private List<ReviewPost> reviewPosts;
 
     public void updateUserInfo(String username, String profile, String snsUrl, String email) {
         this.username = username;
@@ -51,5 +49,17 @@ public class User {
     public void updateSnsUrl(String snsUrl) {
         this.snsUrl = snsUrl;
     }
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<UserVote> userVotes;
+    
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Likes> likes;
 
 }
