@@ -26,6 +26,8 @@ public class CommentController {
     public String uploadComment(@RequestBody CommentDto commentDto) {
         Comment comment = this.commentService.createComment(commentDto);
         return comment.getContent();
+        //여기서 포스트의 아이디도 받아서 post id 를 comment
+        //
     }
 
     @GetMapping("/{id}")

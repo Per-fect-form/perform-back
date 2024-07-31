@@ -11,6 +11,7 @@ import java.util.List;
 public class CommentService {
 
     private CommentRepository commentRepository;
+    CommentDto commentDto = new CommentDto();
 
     public CommentService(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;

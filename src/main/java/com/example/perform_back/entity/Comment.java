@@ -7,8 +7,10 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
-@Data
+@Data //lomboc 합친, 느낌 객체도 들어있음 ,,
 public class Comment {
+    //ㅔ=포스트 객체 그대로, 포스트 아이디로 해당 게시물 찾고, setpost 해서 comment post 연결
+        //attachment랑 연결
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
