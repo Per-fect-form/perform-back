@@ -10,6 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
+    //실험용 주석처리
 
     private CommentService commentService;
 
@@ -27,7 +28,7 @@ public class CommentController {
         Comment comment = this.commentService.createComment(commentDto);
         return comment.getContent();
         //여기서 포스트의 아이디도 받아서 post id 를 comment
-        //
+
     }
 
     @GetMapping("/{id}")

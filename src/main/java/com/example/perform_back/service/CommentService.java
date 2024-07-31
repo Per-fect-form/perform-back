@@ -29,6 +29,4 @@ public class CommentService {
     }
 
     public List<Comment> getAllComments() {
-        return this.commentRepository.findAll();
-    }
-}
+        ret
