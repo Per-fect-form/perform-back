@@ -30,16 +30,26 @@ public class User {
     @JsonManagedReference
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Likes> likes;
 
-    // 사용자가 수신한 알림 목록
-    @OneToMany(mappedBy = "user")
-    private List<Notification> receivedNotifications;
 
-    // 사용자가 생성한 알림 목록
-    @OneToMany(mappedBy = "actionUser")
-    private List<Notification> createdNotifications;
+
+    public void updateUserInfo(String username, String profile, String snsUrl, String email) {
+        this.username = username;
+        this.profile = profile;
+        this.snsUrl = snsUrl;
+    }
+
+    //이메일 제외
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
+    public void updateProfile(String profile) {
+        this.profile = profile;
+    }
+
+    public void updateSnsUrl(String snsUrl) {
+        this.snsUrl = snsUrl;
+    }
 
 }
