@@ -63,14 +63,6 @@ public class KakaoUserInfoResponseDto {
         @JsonProperty("profile")
         public Profile profile;
 
-        //이름 제공 동의 여부
-        @JsonProperty("name_needs_agreement")
-        public Boolean isNameAgree;
-
-        //카카오계정 이름
-        @JsonProperty("name")
-        public String name;
-
         //이메일 제공 동의 여부
         @JsonProperty("email_needs_agreement")
         public Boolean isEmailAgree;
@@ -88,65 +80,6 @@ public class KakaoUserInfoResponseDto {
         //카카오계정 대표 이메일
         @JsonProperty("email")
         public String email;
-
-        //연령대 제공 동의 여부
-        @JsonProperty("age_range_needs_agreement")
-        public Boolean isAgeAgree;
-
-        //연령대
-        //참고 https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
-        @JsonProperty("age_range")
-        public String ageRange;
-
-        //출생 연도 제공 동의 여부
-        @JsonProperty("birthyear_needs_agreement")
-        public Boolean isBirthYearAgree;
-
-        //출생 연도 (YYYY 형식)
-        @JsonProperty("birthyear")
-        public String birthYear;
-
-        //생일 제공 동의 여부
-        @JsonProperty("birthday_needs_agreement")
-        public Boolean isBirthDayAgree;
-
-        //생일 (MMDD 형식)
-        @JsonProperty("birthday")
-        public String birthDay;
-
-        //생일 타입
-        // SOLAR(양력) 혹은 LUNAR(음력)
-        @JsonProperty("birthday_type")
-        public String birthDayType;
-
-        //성별 제공 동의 여부
-        @JsonProperty("gender_needs_agreement")
-        public Boolean isGenderAgree;
-
-        //성별
-        @JsonProperty("gender")
-        public String gender;
-
-        //전화번호 제공 동의 여부
-        @JsonProperty("phone_number_needs_agreement")
-        public Boolean isPhoneNumberAgree;
-
-        //전화번호
-        //국내 번호인 경우 +82 00-0000-0000 형식
-        @JsonProperty("phone_number")
-        public String phoneNumber;
-
-        //CI 동의 여부
-        @JsonProperty("ci_needs_agreement")
-        public Boolean isCIAgree;
-
-        //CI, 연계 정보
-        @JsonProperty("ci")
-        public String ci;
-
-        //CI 발급 시각, UTC
-        @JsonProperty("ci_authenticated_at")
-        public Date ciCreatedAt;
 
         @Getter
         @NoArgsConstructor

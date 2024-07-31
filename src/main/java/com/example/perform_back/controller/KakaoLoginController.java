@@ -2,6 +2,7 @@ package com.example.perform_back.controller;
 
 import com.example.perform_back.dto.KakaoUserInfoResponseDto;
 import com.example.perform_back.service.KakaoService;
+import com.example.perform_back.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class KakaoLoginController {
 
     private final KakaoService kakaoService;
+    private final UserService userService;
 
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
@@ -27,7 +29,9 @@ public class KakaoLoginController {
 
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
 
-        // User 로그인, 또는 회원가입 로직 추가
+        userService.saveOrUpdateUser(userInfo.getId(), userInfo.getKakaoAccount().getProfile().getNickName(),
+                userInfo.getKakaoAccount().getProfile().getProfileImageUrl(), userInfo.getKakaoAccount().getEmail());
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
