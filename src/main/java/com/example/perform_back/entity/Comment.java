@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Data //lomboc 합친, 느낌 객체도 들어있음 ,,
 public class Comment {
-
+    // = 포스트 객체 그대로, 포스트 아이디로 해당 게시물 찾고, setpost 해서 comment post 연결
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
@@ -33,4 +33,13 @@ public class Comment {
     @OneToMany(mappedBy = "comment")
     @JsonManagedReference
     private List<Likes> likes;
+
+    public Comment() {}
+
+    public void setPost(Post post) {
+        this.post = post;
+        if (!post.getComments().contains(this)){
+            post.getComments().add(this);
+        }
+    }
 }

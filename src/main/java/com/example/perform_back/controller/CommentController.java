@@ -3,6 +3,7 @@ package com.example.perform_back.controller;
 import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.entity.Comment;
 import com.example.perform_back.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
-
+    @Autowired
     private CommentService commentService;
 
     public CommentController(CommentService commentService){
@@ -26,6 +27,8 @@ public class CommentController {
     public String uploadComment(@RequestBody CommentDto commentDto) {
         Comment comment = this.commentService.createComment(commentDto);
         return comment.getContent();
+        //여기서 포스트의 아이디도 받아서 post id 를 comment
+
     }
 
     @GetMapping("/{id}")
