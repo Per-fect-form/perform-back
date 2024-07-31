@@ -1,5 +1,6 @@
 package com.example.perform_back.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -26,10 +28,12 @@ public class ReviewPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_post_id")
     private Long id;
+
     @OneToOne
     @JoinColumn(name = "vote_id")
     @JsonManagedReference
     private Vote vote;
+
     private String reviewStatus;
     private String title;
     private String content;
@@ -40,6 +44,11 @@ public class ReviewPost {
     @OneToMany(mappedBy = "reviewPost")
     @JsonManagedReference
     private List<Attachment> attachments;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 
     public ReviewPost() {
         this.reviewStatus = "under review";

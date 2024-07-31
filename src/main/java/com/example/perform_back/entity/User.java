@@ -28,5 +28,13 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
+    private List<ReviewPost> reviewPosts;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<UserVote> userVotes;
 }
