@@ -21,6 +21,7 @@ public class UserVoteService {
     private final UserVoteRepository userVoteRepository;
     private final UserRepository userRepository;
 
+
     public UserVoteService(VoteRepository voteRepository, ReviewPostRepository reviewPostRepository,
         UserVoteRepository userVoteRepository, UserRepository userRepository) {
         this.voteRepository = voteRepository;
@@ -30,16 +31,20 @@ public class UserVoteService {
     }
 
     @Transactional
-    public void vote(Long reviewPostId, Long userId, String isAgree) {
+    public void vote(Long reviewPostId, String isAgree) {
+
         ReviewPost reviewPost = reviewPostRepository.findById(reviewPostId)
             .orElseThrow(() -> new IllegalArgumentException("Can't find review post by id"));
         Vote vote = reviewPost.getVote();
 
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("Can't find user by id"));
+//        User user = userRepository.findById(userId)
+//            .orElseThrow(() -> new IllegalArgumentException("Can't find user by id"));
 
         UserVote userVote = new UserVote();
-        userVote.setUser(user);
+//        if (userVoteRepository.existsByUserIdAndVoteReviewPostId(userId, reviewPostId)) {
+//            throw new RuntimeException("이미 투표를 했습니다");
+//        }
+        //userVote.setUser(user);
         userVote.setVote(vote);
         userVote.setIsAgree(isAgree);
         userVote.setVoteDate(new Date());

@@ -9,17 +9,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/uservote")
 @Tag(name = "UserVote", description = "UserVote API")
 public class UserVoteController {
-
     private final UserVoteService userVoteService;
 
     public UserVoteController(UserVoteService userVoteService) {
         this.userVoteService = userVoteService;
     }
 
-    @Operation(summary = "½É»ç °Ô½Ã¹°¿¡ ´ëÇÑ ÅõÇ¥")
+    @Operation(summary = "ì‹¬ì‚¬ ê²Œì‹œë¬¼ì— ëŒ€í•œ íˆ¬í‘œ")
     @PostMapping("/{reviewPostId}")
-    public void vote(@PathVariable Long reviewPostId, @RequestParam Long userId, @RequestParam String isAgree) {
-        userVoteService.vote(reviewPostId, userId, isAgree);
+    public void vote(@PathVariable Long reviewPostId, @RequestParam String isAgree) {
+        userVoteService.vote(reviewPostId, isAgree);
     }
 }
 

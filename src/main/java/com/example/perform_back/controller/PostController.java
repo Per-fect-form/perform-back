@@ -7,6 +7,7 @@ import com.example.perform_back.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,14 +33,20 @@ public class PostController {
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
-    public Post createPost(@RequestPart("post") PostDto post, @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        return this.postService.save(post, files);
+    public Post createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
+        return postService.save(postDto, files);
     }
 
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
     public Post getPost(@PathVariable Long id) {
         return this.postService.findById(id);
+    }
+
+    @Operation(summary = "제목으로 게시글 조회")
+    @GetMapping("/search/{title}")
+    public List<Post> getPostByTitle(@PathVariable String title) {
+        return this.postService.findByTitle(title);
     }
 
     @Operation(summary = "특정 게시글 삭제")
@@ -53,7 +60,7 @@ public class PostController {
     public Post updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
                                @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        return this.postService.updateById(id, postDto, attachmentsDto, files);
+        return  postService.updateById(id, postDto, attachmentsDto, files);
     }
 
 }

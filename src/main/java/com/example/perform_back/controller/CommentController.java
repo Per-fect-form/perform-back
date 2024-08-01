@@ -5,10 +5,12 @@ import com.example.perform_back.entity.Comment;
 import com.example.perform_back.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/api/comment")
 public class CommentController {
 
     private CommentService commentService;
@@ -17,23 +19,25 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @Operation(summary = "모든 댓글 가져오기")
     @GetMapping
     public List<Comment> getAllComments(){
         return this.commentService.getAllComments();
     }
 
-    @PostMapping//("/upload")
-    public String uploadComment(@RequestBody CommentDto commentDto) {
-        Comment comment = this.commentService.createComment(commentDto);
-        return comment.getContent();
+    @Operation(summary = "댓글 달기")
+    @PostMapping("/{postId}")
+    public Comment uploadComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
+        return commentService.createComment(postId, commentDto);
     }
 
+    @Operation(summary = "id로 댓글 가져오기")
     @GetMapping("/{id}")
-    public String getComment(@PathVariable Long id) {
-        Comment comment = commentService.findById(id);
-        if (comment == null) {
-            throw new RuntimeException("comment");
-        }
-        return comment.getContent();//id를 통해 내용을 가져오는게 맞는지?
+    public Comment getComment(@PathVariable Long id) {
+        return commentService.findById(id);
     }
+
+    @Operation(summary = "id로 댓글 삭제")
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable Long id) { commentService.deleteById(id);}
 }

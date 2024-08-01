@@ -6,6 +6,7 @@ import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.global.service.FileS3Service;
 import com.example.perform_back.repository.AttachmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -76,12 +77,14 @@ public class AttachmentService {
         return ext.equals("mp4") || ext.equals("avi") || ext.equals("mov") || ext.equals("mkv") || ext.equals("wmv");
     }
 
+    @Transactional
     public void deleteAllByPost(Post post) {
         List<Attachment> attachments = attachmentRepository.findByPost(post);
         for (Attachment attachment : attachments){
             deleteById(attachment);
         }
     }
+    @Transactional
     public void deleteAllByReviewPost(ReviewPost reviewPost) {
             List<Attachment> attachments = attachmentRepository.findByReviewPost(reviewPost);
             for (Attachment attachment : attachments) {
@@ -93,4 +96,5 @@ public class AttachmentService {
         fileS3Service.deleteFile(attachment);
         attachmentRepository.deleteById(attachment.getId());
     }
+
 }

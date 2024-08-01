@@ -40,4 +40,10 @@ public class LikesController {
     public List<Likes> getCommentLikes(@PathVariable Long commentId) {
         return likesService.findCommentLikes(commentId);
     }
+
+    @Operation(summary = "공감 삭제")
+    @GetMapping("/{id}")
+    public void deleteLikes(@PathVariable Long id) {
+        likesService.deleteById(id);
+    }
 }

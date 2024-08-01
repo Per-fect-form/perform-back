@@ -22,7 +22,7 @@ public class KakaoLoginController {
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         log.info(code);
-        String accessToken = kakaoService.getAccessTokenFromKakao(code);
+        String accessToken = kakaoService.getAccessTokenFromKakao(code); //access토큰 null일때 처리
         log.info(accessToken);
 
         KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);

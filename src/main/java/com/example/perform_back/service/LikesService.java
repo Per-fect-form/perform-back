@@ -49,4 +49,7 @@ public class LikesService {
         return likes;
     }
 
+    public void deleteById(Long id) {
+        likesRepository.deleteById(id);
+    }
 }
