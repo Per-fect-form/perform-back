@@ -10,9 +10,8 @@ import java.util.List;
 @Entity
 @Data
 public class User {
-  
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -35,9 +34,10 @@ public class User {
         this.username = username;
         this.profile = profile;
         this.snsUrl = snsUrl;
+        this.email = email;
     }
 
-    //이메일 제외
+    // 이메일 제외
     public void updateUsername(String username) {
         this.username = username;
     }
@@ -57,9 +57,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<UserVote> userVotes;
-    
+
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<Likes> likes;
-
 }

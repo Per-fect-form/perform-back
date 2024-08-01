@@ -3,6 +3,7 @@ package com.example.perform_back.controller;
 import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.entity.Comment;
 import com.example.perform_back.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/comment")
 public class CommentController {
-
+    @Autowired
     private CommentService commentService;
 
     public CommentController(CommentService commentService){
@@ -24,6 +25,7 @@ public class CommentController {
     public List<Comment> getAllComments(){
         return this.commentService.getAllComments();
     }
+
 
     @Operation(summary = "댓글 달기")
     @PostMapping("/{postId}")
