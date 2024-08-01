@@ -145,7 +145,7 @@ public class ReviewPostService {
             String mimeType = getMimeTypeFromExtension(originalFilename);
 
             if (!isSupportedContentType(mimeType)) {
-                throw new IllegalArgumentException("지원되지 않는 파일 유형 " + originalFilename);
+                throw new IllegalArgumentException("파일이 첨부되지 않았거나 지원되지 않는 파일 유형입니다. " + originalFilename);
             }
         }
     }
