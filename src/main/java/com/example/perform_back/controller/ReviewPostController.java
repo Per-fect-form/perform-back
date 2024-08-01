@@ -41,9 +41,9 @@ public class ReviewPostController {
 
     @Operation(summary = "심사 게시글 업로드")
     @PostMapping("/upload")
-    public ReviewPost createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPost,
-                                       @RequestPart("file") MultipartFile[] files) throws Exception {
-        return this.reviewPostService.createReviewPost(reviewPost, files);
+    public ReviewPost createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPostDto,
+                                       @RequestPart("files") MultipartFile[] files) {
+        return this.reviewPostService.createReviewPost(reviewPostDto, files);
     }
 
     @Operation(summary = "특정 심사 게시글 조회")
@@ -59,7 +59,7 @@ public class ReviewPostController {
     }
 
     @Operation(summary = "제목으로 심사 게시글 조회")
-    @GetMapping("/search/{id}")
+    @GetMapping("/search/{title}")
     public List<ReviewPost> getReviewPostByTitle(@PathVariable String title) {
         return reviewPostService.getReviewPostByTitle(title);
     }
@@ -67,8 +67,8 @@ public class ReviewPostController {
     @Operation(summary = "특정 심사 게시글 수정")
     @PatchMapping("/{id}")
     public ReviewPost updateReviewPostByTitle(@PathVariable Long id,
-                                              @RequestPart("reviewPost") ReviewPostDto reviewPost,
-                                              @RequestPart("file") MultipartFile[] files) {
-        return reviewPostService.updateReviewPostById(id, reviewPost, files);
+                                              @RequestPart("reviewPost") ReviewPostDto reviewPostDto,
+                                              @RequestPart("files") MultipartFile[] files) {
+        return reviewPostService.updateReviewPostById(id, reviewPostDto, files);
     }
 }

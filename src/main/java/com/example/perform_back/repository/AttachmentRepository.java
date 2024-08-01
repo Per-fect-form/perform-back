@@ -11,5 +11,4 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
     List<Attachment> findByPost(Post savedPost);
     List<Attachment> findByReviewPost(ReviewPost savedPost);
 
-
 }
