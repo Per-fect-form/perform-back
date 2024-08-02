@@ -1,5 +1,6 @@
 package com.example.perform_back.service;
 
+import com.example.perform_back.dto.AttachmentDto;
 import com.example.perform_back.entity.Attachment;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AttachmentService {
@@ -95,6 +97,20 @@ public class AttachmentService {
     public void deleteById(Attachment attachment) {
         fileS3Service.deleteFile(attachment);
         attachmentRepository.deleteById(attachment.getId());
+    }
+
+    public List<AttachmentDto> convertToDto(List<Attachment> attachments) {
+        if(attachments == null)
+            return null;
+
+        else return attachments.stream()
+                .map(attachment -> {
+                    AttachmentDto dto = new AttachmentDto();
+                    dto.setId(attachment.getId());
+                    dto.setFilePath(attachment.getPath());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
 }

@@ -4,6 +4,7 @@ import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.service.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,21 +30,22 @@ public class PostController {
 
     @Operation(summary = "전체 게시글 조회")
     @GetMapping
-    public List<Post> getAllPosts(){
-        return this.postService.findAll();
+    public List<PostDto> getAllPosts(){
+        return this.postService.convertToPostDtoList(postService.findAll());
     }
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
-    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        Post savedPost = postService.save(postDto, files);
+
+    public PostDto createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
+                           @RequestHeader("authorization") String accessToken) throws JsonProcessingException {
+        Post savedPost = postService.save(postDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
-
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
-    public Post getPost(@PathVariable Long id) {
-        return this.postService.findById(id);
+    public PostDto getPost(@PathVariable Long id) {
+        return postService.converToPostDto( postService.findById(id));
     }
 
     @Operation(summary = "제목으로 게시글 조회")
