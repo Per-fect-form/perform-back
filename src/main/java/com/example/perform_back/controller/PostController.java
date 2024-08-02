@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,11 +36,12 @@ public class PostController {
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
+
     public PostDto createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
                            @RequestHeader("authorization") String accessToken) throws JsonProcessingException {
-        return postService.save(postDto, files, accessToken);
+        Post savedPost = postService.save(postDto, files, accessToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
-
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
     public PostDto getPost(@PathVariable Long id) {

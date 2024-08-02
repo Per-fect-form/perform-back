@@ -1,6 +1,7 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.ReviewPostDto;
+import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.entity.UserVote;
@@ -142,35 +143,34 @@ public class ReviewPostService {
     private void validateFiles(MultipartFile[] files) {
         for (MultipartFile file : files) {
             String originalFilename = file.getOriginalFilename();
-            String mimeType = getMimeTypeFromExtension(originalFilename);
+            String fileExtension = getFileExtension(originalFilename);
 
-            if (!isSupportedContentType(mimeType)) {
-                throw new IllegalArgumentException("지원되지 않는 파일 유형 " + originalFilename);
+            if (originalFilename == null || originalFilename.isEmpty() || !isSupportedExtension(fileExtension)) {
+                throw new IllegalArgumentException("파일이 첨부되지 않았거나 지원되지 않는 파일 유형입니다. " + originalFilename);
             }
         }
     }
-    private static final Map<String, String> MIME_TYPES = new HashMap<>();
-    static {
-        MIME_TYPES.put("png", "image/png");
-        MIME_TYPES.put("jpg", "image/jpeg");
-        MIME_TYPES.put("jpeg", "image/jpeg");
-        MIME_TYPES.put("gif", "image/gif");
-        MIME_TYPES.put("bmp", "image/bmp");
-        MIME_TYPES.put("webp", "image/webp");
-        MIME_TYPES.put("mp4", "video/mp4");
-        MIME_TYPES.put("mpeg", "video/mpeg");
-        MIME_TYPES.put("ogg", "video/ogg");
-        MIME_TYPES.put("webm", "video/webm");
-        MIME_TYPES.put("mov", "video/quicktime");
-    }
-    private String getMimeTypeFromExtension(String fileName) {
-        String extension = getFileExtension(fileName);
-        return MIME_TYPES.get(extension.toLowerCase());
+    private boolean isSupportedExtension(String extension) {
+        String[] supportedExtensions = {"png", "jpg", "jpeg", "gif", "bmp", "webp", "mp4", "mpeg", "ogg", "webm", "mov"};
+        for (String supportedExtension : supportedExtensions) {
+            if (supportedExtension.equalsIgnoreCase(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.lastIndexOf('.') == -1) {
             return "";
         }
         return fileName.substring(fileName.lastIndexOf('.') + 1);
+    }
+
+    public ReviewPost findById(Long reviewPostId) {
+        Optional<ReviewPost> reviewPost = reviewPostRepository.findById(reviewPostId);
+        if (reviewPost.isPresent())
+            return reviewPost.get();
+        else
+            throw new RuntimeException("Post not found");
     }
 }
