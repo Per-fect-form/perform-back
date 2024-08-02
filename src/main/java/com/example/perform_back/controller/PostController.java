@@ -37,11 +37,12 @@ public class PostController {
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
 
-    public PostDto createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
-                           @RequestHeader("authorization") String accessToken) throws JsonProcessingException {
-        Post savedPost = postService.save(postDto, files, accessToken);
+    public ResponseEntity<PostDto> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                              @RequestHeader("authorization") String accessToken) throws JsonProcessingException {
+        PostDto savedPost = postService.save(postDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
+    
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
     public PostDto getPost(@PathVariable Long id) {
