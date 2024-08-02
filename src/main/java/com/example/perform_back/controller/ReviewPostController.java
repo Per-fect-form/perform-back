@@ -3,6 +3,7 @@ package com.example.perform_back.controller;
 import com.example.perform_back.dto.ReviewPostDto;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.service.ReviewPostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,9 @@ public class ReviewPostController {
     @Operation(summary = "심사 게시글 업로드")
     @PostMapping("/upload")
     public ResponseEntity<ReviewPost> createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPostDto,
-                                       @RequestPart("files") MultipartFile[] files) {
-        ReviewPost reviewPost = reviewPostService.createReviewPost(reviewPostDto, files);
+                                       @RequestPart("files") MultipartFile[] files,
+                                       @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        ReviewPost reviewPost = reviewPostService.createReviewPost(reviewPostDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewPost);
     }
 
