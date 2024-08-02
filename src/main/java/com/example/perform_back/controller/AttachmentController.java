@@ -19,7 +19,6 @@ public class AttachmentController {
     @PostMapping("/upload")
     public String uploadProfileImage(@RequestParam("file") MultipartFile file) {
         return attachmentService.save(file).getPath();
-
     }
 
     @GetMapping("/{id}")

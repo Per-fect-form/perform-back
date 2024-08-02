@@ -1,22 +1,18 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.ReviewPostDto;
-import com.example.perform_back.entity.Post;
-import com.example.perform_back.entity.ReviewPost;
-import com.example.perform_back.entity.User;
-import com.example.perform_back.entity.UserVote;
-import com.example.perform_back.entity.Vote;
+import com.example.perform_back.entity.*;
 import com.example.perform_back.repository.LikesRepository;
 import com.example.perform_back.repository.ReviewPostRepository;
 import com.example.perform_back.repository.UserRepository;
 import com.example.perform_back.repository.UserVoteRepository;
 import com.example.perform_back.repository.VoteRepository;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,40 +28,42 @@ public class ReviewPostService {
 
     private final UserVoteRepository userVoteRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
     public ReviewPostService(ReviewPostRepository reviewPostRepository,
                              VoteRepository voteRepository,
                              AttachmentService attachmentService, LikesRepository likesRepository,
-        UserVoteRepository userVoteRepository, UserRepository userRepository) {
+                             UserVoteRepository userVoteRepository, UserRepository userRepository, UserService userService) {
         this.reviewPostRepository = reviewPostRepository;
         this.voteRepository = voteRepository;
         this.attachmentService = attachmentService;
         this.likesRepository = likesRepository;
         this.userVoteRepository = userVoteRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
-    public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files) {
+    public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files, String accessToken) throws JsonProcessingException {
+        User user = userService.findByAccessToken(accessToken); // 저장하기 전에 accessToken 먼저 검사
 
         validateFiles(files); // 파일이 빈 경우에도 파일 유형문제로 처리되는 경우를 제어
-
-        //User user = userRepository.findById(userId).get();
-
-        Vote vote = new Vote();
-        voteRepository.save(vote);
 
         ReviewPost reviewPostToSave = convertToPost(reviewPostDto, new ReviewPost());
 
         validateTitle(reviewPostToSave.getTitle()); //제목 없이 게시물 생성 시도
 
+        Vote vote = new Vote();
+        voteRepository.save(vote);
+
         reviewPostToSave = reviewPostRepository.save(reviewPostToSave);
         reviewPostToSave.setVote(vote);
-        //reviewPostToSave.setUser(user);
+        reviewPostToSave.setUser(user);
 
         saveMultipartFiles(files, reviewPostToSave);
 
         return reviewPostToSave;
     }
+
     public ReviewPost getReviewPostById(Long id) throws NoSuchElementException {
         Optional<ReviewPost> reviewPost = reviewPostRepository.findById(id);
         if (reviewPost.isEmpty()) throw new IllegalArgumentException("Post not found");

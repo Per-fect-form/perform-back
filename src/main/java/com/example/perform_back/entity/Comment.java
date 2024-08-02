@@ -36,10 +36,4 @@ public class Comment {
 
     public Comment() {}
 
-    public void setPost(Post post) {
-        this.post = post;
-        if (!post.getComments().contains(this)){
-            post.getComments().add(this);
-        }
-    }
 }

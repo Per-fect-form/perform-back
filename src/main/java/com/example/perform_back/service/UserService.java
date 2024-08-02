@@ -3,6 +3,7 @@ package com.example.perform_back.service;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
 import com.example.perform_back.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,14 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
+    private KakaoService kakaoService;
+
+    @Autowired
+    public UserService(UserRepository userRepository, KakaoService kakaoService){
+        this.userRepository = userRepository;
+        this.kakaoService = kakaoService;
+    }
 
     // 사용자 정보 DB저장
     public User saveOrUpdateUser(Long id, String username, String profile, String email) {
@@ -67,5 +74,15 @@ public class UserService {
 
     public User findById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    public User findByAccessToken(String token) throws JsonProcessingException {
+        Long userId = kakaoService.getUserInfo(token).getId();
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isPresent())
+            return user.get();
+        else
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+
     }
 }

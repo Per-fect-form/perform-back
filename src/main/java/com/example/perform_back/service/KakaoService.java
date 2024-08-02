@@ -1,7 +1,6 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.KakaoInfoDto;
-import com.example.perform_back.dto.KakaoUserInfoResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KakaoService {
 
-    private final UserService userService;
     @Value("${kakao.client_id}")
     private String clientId;
     @Value("${kakao.client_secret}")
