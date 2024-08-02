@@ -10,6 +10,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,9 +43,10 @@ public class ReviewPostController {
 
     @Operation(summary = "심사 게시글 업로드")
     @PostMapping("/upload")
-    public ReviewPost createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPostDto,
+    public ResponseEntity<ReviewPost> createReviewPost(@RequestPart("reviewPost") ReviewPostDto reviewPostDto,
                                        @RequestPart("files") MultipartFile[] files) {
-        return this.reviewPostService.createReviewPost(reviewPostDto, files);
+        ReviewPost reviewPost = reviewPostService.createReviewPost(reviewPostDto, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewPost);
     }
 
     @Operation(summary = "특정 심사 게시글 조회")

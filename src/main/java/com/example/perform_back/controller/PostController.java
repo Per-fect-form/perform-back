@@ -34,14 +34,10 @@ public class PostController {
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
-    public Post createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        return postService.save(postDto, files);
+    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
+        Post savedPost = postService.save(postDto, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
-//    @PostMapping("/upload")
-//    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
-//        Post savedPost = postService.save(postDto, files);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
-//    }
 
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
