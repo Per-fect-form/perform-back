@@ -17,10 +17,11 @@ public class PostDto {
     private Date createdDate;
 
     private List<AttachmentDto> attachments;
+    private List<CommentDto> comments;
     private int likes;
 
     @Builder
-    public PostDto(Long id, String title, String content, String category, Long userId, Date createdDate, List<AttachmentDto> attachments, int likes) {
+    public PostDto(Long id, String title, String content, String category, Long userId, Date createdDate, List<AttachmentDto> attachments, List<CommentDto> comments, int likes) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -28,6 +29,7 @@ public class PostDto {
         this.userId = userId;
         this.createdDate = createdDate;
         this.attachments = attachments;
+        this.comments = comments;
         this.likes = likes;
     }
 

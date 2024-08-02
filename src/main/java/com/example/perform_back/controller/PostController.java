@@ -38,7 +38,7 @@ public class PostController {
     @PostMapping("/upload")
 
     public ResponseEntity<PostDto> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
-                                              @RequestHeader("authorization") String accessToken) throws JsonProcessingException {
+                                              @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
         PostDto savedPost = postService.save(postDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
@@ -57,7 +57,7 @@ public class PostController {
 
     @Operation(summary = "특정 게시글 삭제")
     @DeleteMapping("/{id}")
-    public void deletePostById(@PathVariable Long id) {
+    public void deletePostById(@PathVariable Long id){
         this.postService.deleteById(id);
     }
 

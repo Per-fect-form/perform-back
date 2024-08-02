@@ -99,18 +99,4 @@ public class AttachmentService {
         attachmentRepository.deleteById(attachment.getId());
     }
 
-    public List<AttachmentDto> convertToDto(List<Attachment> attachments) {
-        if(attachments == null)
-            return null;
-
-        else return attachments.stream()
-                .map(attachment -> {
-                    AttachmentDto dto = new AttachmentDto();
-                    dto.setId(attachment.getId());
-                    dto.setFilePath(attachment.getPath());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
 }

@@ -2,8 +2,10 @@ package com.example.perform_back.service;
 
 import com.example.perform_back.dto.AttachmentDto;
 import com.example.perform_back.dto.AttachmentsDto;
+import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Attachment;
+import com.example.perform_back.entity.Comment;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.repository.CommentRepository;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -66,23 +69,17 @@ public class PostService {
 
     public Post findById(Long id) {
         Optional<Post> post = postRepository.findById(id);
-        if (post.isPresent()){
-            System.out.println("Post 반환");
+        if (post.isPresent())
             return post.get();
-        }
-        else{
-            System.out.println("Post null");
-            throw new RuntimeException("Post not found");
-        }
+        else
+            throw new RuntimeException("존재하지 않는 게시글 ID 입니다.");
     }
 
     @Transactional
     public void deleteById(Long id) {
-         Optional<Post> post = postRepository.findById(id);
-         if(post.isEmpty())
-             throw new RuntimeException("Post not found");
+         Post post = findById(id);
 
-         attachmentService.deleteAllByPost(post.get());
+         attachmentService.deleteAllByPost(post);
          commentRepository.deleteAllByPostId(id);
          likesRepository.deleteAllByPostId(id);
          postRepository.deleteById(id);
@@ -142,7 +139,8 @@ public class PostService {
                 .category(postToSave.getCategory())
                 .userId(postToSave.getUser().getId())
                 .createdDate(postToSave.getCreatedDate())
-                .attachments(attachmentService.convertToDto(postToSave.getAttachments()))
+                .attachments(convertToAttchmentDtoList(postToSave.getAttachments()))
+                .comments(convertToCommentDtoList(postToSave.getComments()))
                 .build();
     }
 
@@ -155,5 +153,34 @@ public class PostService {
 
     public List<Post> findByTitle(String title) {
         return postRepository.findByTitleContaining(title);
+    }
+
+    private List<CommentDto> convertToCommentDtoList(List<Comment> comments) {
+        if(comments == null)
+            return null;
+
+        else return comments.stream()
+                .map(comment -> CommentDto.builder()
+                        .id(comment.getId())
+                        .content(comment.getContent())
+                        .date(new Date())
+                        .userId(comment.getUser().getId())
+                        .postId(comment.getPost().getId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private List<AttachmentDto> convertToAttchmentDtoList(List<Attachment> attachments) {
+        if(attachments == null)
+            return null;
+
+        else return attachments.stream()
+                .map(attachment -> {
+                    AttachmentDto dto = new AttachmentDto();
+                    dto.setId(attachment.getId());
+                    dto.setFilePath(attachment.getPath());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
