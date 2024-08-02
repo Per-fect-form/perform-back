@@ -1,6 +1,5 @@
 package com.example.perform_back.dto;
 
-import com.example.perform_back.entity.Attachment;
 import lombok.Builder;
 import lombok.Data;
 

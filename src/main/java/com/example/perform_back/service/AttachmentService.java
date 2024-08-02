@@ -1,6 +1,5 @@
 package com.example.perform_back.service;
 
-import com.example.perform_back.dto.AttachmentDto;
 import com.example.perform_back.entity.Attachment;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
@@ -12,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AttachmentService {
