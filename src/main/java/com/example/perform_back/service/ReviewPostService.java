@@ -1,6 +1,7 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.ReviewPostDto;
+import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.entity.UserVote;
@@ -145,7 +146,7 @@ public class ReviewPostService {
             String mimeType = getMimeTypeFromExtension(originalFilename);
 
             if (!isSupportedContentType(mimeType)) {
-                throw new IllegalArgumentException("지원되지 않는 파일 유형 " + originalFilename);
+                throw new IllegalArgumentException("파일이 첨부되지 않았거나 지원되지 않는 파일 유형입니다. " + originalFilename);
             }
         }
     }
@@ -172,5 +173,13 @@ public class ReviewPostService {
             return "";
         }
         return fileName.substring(fileName.lastIndexOf('.') + 1);
+    }
+
+    public ReviewPost findById(Long reviewPostId) {
+        Optional<ReviewPost> reviewPost = reviewPostRepository.findById(reviewPostId);
+        if (reviewPost.isPresent())
+            return reviewPost.get();
+        else
+            throw new RuntimeException("Post not found");
     }
 }
