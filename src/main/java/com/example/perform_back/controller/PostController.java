@@ -29,14 +29,14 @@ public class PostController {
 
     @Operation(summary = "전체 게시글 조회")
     @GetMapping
-    public List<PostDto> getAllPosts(){
-        return this.postService.convertToPostDtoList(postService.findAll());
+    public ResponseEntity<List<PostDto>> getAllPosts(){
+        return ResponseEntity.status(HttpStatus.OK).body(postService.findAll());
     }
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
-
-    public ResponseEntity<PostDto> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files,
+    public ResponseEntity<PostDto> createPost(@RequestPart("post") PostDto postDto,
+                                              @RequestPart(value = "files", required = false) MultipartFile[] files,
                                               @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
         PostDto savedPost = postService.save(postDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
@@ -44,14 +44,16 @@ public class PostController {
     
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
-    public PostDto getPost(@PathVariable Long id) {
-        return postService.converToPostDto( postService.findById(id));
+    public ResponseEntity<PostDto> getPost(@PathVariable Long id) {
+        PostDto postDto = postService.converToPostDto(postService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(postDto);
     }
 
     @Operation(summary = "제목으로 게시글 조회")
     @GetMapping("/search/{title}")
-    public List<Post> getPostByTitle(@PathVariable String title) {
-        return this.postService.findByTitle(title);
+    public ResponseEntity<List<PostDto>> getPostByTitle(@PathVariable String title) {
+        List<PostDto> postDtoList = postService.findByTitle(title);
+        return ResponseEntity.status(HttpStatus.OK).body(postDtoList);
     }
 
     @Operation(summary = "특정 게시글 삭제")
@@ -65,7 +67,7 @@ public class PostController {
     public Post updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
                                @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
                                @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        return  postService.updateById(id, postDto, attachmentsDto, files);
+        return postService.updateById(id, postDto, attachmentsDto, files);
     }
 
 }

@@ -12,28 +12,20 @@ import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final LikesRepository likesRepository;
     private final UserService userService;
     private final PostService postService;
-
-    @Autowired
-    public CommentService(CommentRepository commentRepository, LikesRepository likesRepository,UserService userService, PostService postService) {
-        this.commentRepository = commentRepository;
-        this.likesRepository = likesRepository;
-        this.userService = userService;
-        this.postService = postService;
-    }
-
 
     public CommentDto createComment(Long postId, CommentDto commentDto, String accessToken) throws JsonProcessingException {
         if (commentDto.getContent() == null || commentDto.getContent().isEmpty())
@@ -49,30 +41,55 @@ public class CommentService {
         newComment.setCreatedDate(new Date());
         newComment = commentRepository.save(newComment);
 
-        return converToCommentDto(newComment);
+        return converToCommentDto(newComment, user);
     }
 
     public Comment findById(Long id) {
-        return commentRepository.findById(id).orElse(null);
+        Optional<Comment> comment = commentRepository.findById(id);
+        if(comment.isPresent())
+            return comment.get();
+        else
+            throw new RuntimeException("해당 댓글이 존재하지 않습니다.");
     }
 
     public List<Comment> getAllComments() {
         return this.commentRepository.findAll();
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Long id, String accessToken) throws JsonProcessingException {
+        Comment comment = findById(id);
+        User user = userService.findByAccessToken(accessToken);
+
+        if(!comment.getUser().getId().equals(user.getId()))
+            throw new RuntimeException("삭제 권한이 없습니다.");
+
         commentRepository.deleteById(id);
         likesRepository.deleteByCommentId(id);
     }
 
-    public CommentDto converToCommentDto(Comment comment) {
+    public List<CommentDto> findByPostAndUser(Long postId, String accessToken) throws JsonProcessingException {
+        User user = userService.findByAccessToken(accessToken);
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        return convertToCommentDtoList(comments,user);
+    }
+
+    public CommentDto converToCommentDto(Comment comment, User user) {
         return CommentDto.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
                 .date(new Date())
                 .userId(comment.getUser().getId())
                 .postId(comment.getPost().getId())
+                .likesNum(likesRepository.findByComment(comment).size())
+                .liked(likesRepository.existsByCommentAndUser(comment, user))
+                .isExpert(user.isExpert())
                 .build();
+    }
+
+    private List<CommentDto> convertToCommentDtoList(List<Comment> comments, User user) {
+        return comments.stream()
+            .map(comment -> converToCommentDto(comment, user))
+            .collect(Collectors.toList());
     }
 
 }

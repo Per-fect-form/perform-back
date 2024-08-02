@@ -29,7 +29,6 @@ public class CommentController {
         return this.commentService.getAllComments();
     }
 
-
     @Operation(summary = "댓글 달기")
     @PostMapping("/{postId}")
     public ResponseEntity<CommentDto> uploadComment(@PathVariable Long postId, @RequestBody CommentDto commentDto,
@@ -38,16 +37,19 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
-    @Operation(summary = "id로 댓글 가져오기")
-    @GetMapping("/{id}")
-    public ResponseEntity<CommentDto> getComment(@PathVariable Long id) {
-        Comment comment = commentService.findById(id);
-        CommentDto commentDto = commentService.converToCommentDto(comment);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentDto);
+    @Operation(summary = "Post id로 게시글 댓글 목록 가져오기")
+    @GetMapping("/{postId}")
+    public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long postId,
+                                                        @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        List<CommentDto> commentDtoList = commentService.findByPostAndUser(postId, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(commentDtoList);
     }
 
-    @Operation(summary = "id로 댓글 삭제")
+    @Operation(summary = "Comment id로 댓글 삭제하기")
     @DeleteMapping("/{id}")
-    public void deleteComment(@PathVariable Long id) { commentService.deleteById(id);}
+    public ResponseEntity<String> deleteComment(@PathVariable Long id, @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        commentService.deleteById(id, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body("댓글이 삭제되었습니다.");
+    }
+
 }
