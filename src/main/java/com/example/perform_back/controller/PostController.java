@@ -7,6 +7,7 @@ import com.example.perform_back.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,11 @@ public class PostController {
     public Post createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
         return postService.save(postDto, files);
     }
+//    @PostMapping("/upload")
+//    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
+//        Post savedPost = postService.save(postDto, files);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
+//    }
 
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")

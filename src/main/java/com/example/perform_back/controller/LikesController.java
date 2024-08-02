@@ -23,16 +23,29 @@ public class LikesController {
         return likesService.likesPost(postId, username);
     }
 
+    @Operation(summary = "심사 게시글 공감 누르기")
+    @PostMapping("/reviewpost/{reviewpostId}/{username}")
+    public Likes likesReviewPost(@PathVariable Long reviewPostId,@PathVariable String username) {
+        return likesService.likesReviewPost(reviewPostId, username);
+    }
+
     @Operation(summary = "댓글 공감 누르기")
     @PostMapping("/comment/{commentId}/{username}")
     public Likes likesComment(@PathVariable Long commentId, @PathVariable String username) {
         return likesService.likesComment(commentId, username);
     }
 
+
     @Operation(summary = "게시글 공감 내역 조회")
     @GetMapping("/post/{postId}")
     public List<Likes> getPostLikes(@PathVariable Long postId) {
         return likesService.findPostLikes(postId);
+    }
+
+    @Operation(summary = "심사 게시글 공감 내역 조회")
+    @GetMapping("/reviewpost/{reviewPostId}")
+    public List<Likes> getReviewPostLikes(@PathVariable Long reviewPostId) {
+        return likesService.findReviewPostLikes(reviewPostId);
     }
 
     @Operation(summary = "댓글 공감 내역 조회")

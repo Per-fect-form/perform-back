@@ -1,6 +1,7 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.ReviewPostDto;
+import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.ReviewPost;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.entity.UserVote;
@@ -172,5 +173,13 @@ public class ReviewPostService {
             return "";
         }
         return fileName.substring(fileName.lastIndexOf('.') + 1);
+    }
+
+    public ReviewPost findById(Long reviewPostId) {
+        Optional<ReviewPost> reviewPost = reviewPostRepository.findById(reviewPostId);
+        if (reviewPost.isPresent())
+            return reviewPost.get();
+        else
+            throw new RuntimeException("Post not found");
     }
 }
