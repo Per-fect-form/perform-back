@@ -1,7 +1,6 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.entity.ReviewPost;
-import com.example.perform_back.entity.User;
 import com.example.perform_back.entity.UserVote;
 import com.example.perform_back.entity.Vote;
 import com.example.perform_back.repository.ReviewPostRepository;
@@ -31,7 +30,7 @@ public class UserVoteService {
     }
 
     @Transactional
-    public void vote(Long reviewPostId, String isAgree) {
+    public Vote vote(Long reviewPostId, String isAgree) {
 
         ReviewPost reviewPost = reviewPostRepository.findById(reviewPostId)
             .orElseThrow(() -> new IllegalArgumentException("Can't find review post by id"));
@@ -56,5 +55,6 @@ public class UserVoteService {
             vote.setDisagreeNum(vote.getDisagreeNum() + 1);
         }
         voteRepository.save(vote);
+        return vote;
     }
 }

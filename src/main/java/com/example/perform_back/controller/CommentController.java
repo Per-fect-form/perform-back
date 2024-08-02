@@ -4,6 +4,9 @@ import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.entity.Comment;
 import com.example.perform_back.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +32,9 @@ public class CommentController {
 
     @Operation(summary = "댓글 달기")
     @PostMapping("/{postId}")
-    public Comment uploadComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
-        return commentService.createComment(postId, commentDto);
+    public ResponseEntity<Comment> uploadComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
+        Comment comment = commentService.createComment(postId, commentDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
     @Operation(summary = "id로 댓글 가져오기")
