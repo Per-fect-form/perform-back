@@ -23,7 +23,6 @@ public class User {
     private String email;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user")

@@ -5,14 +5,17 @@ import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Attachment;
 import com.example.perform_back.entity.Post;
+import com.example.perform_back.entity.User;
 import com.example.perform_back.repository.CommentRepository;
 import com.example.perform_back.repository.LikesRepository;
 import com.example.perform_back.repository.PostRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,22 +27,25 @@ public class PostService {
     private final AttachmentService attachmentService;
     private final CommentRepository commentRepository;
     private final LikesRepository likesRepository;
+    private final KakaoService kakaoService;
+    private final UserService userService;
 
     @Autowired
     public PostService(PostRepository postRepository, AttachmentService attachmentService,
-        CommentRepository commentRepository, LikesRepository likesRepository) {
+                       CommentRepository commentRepository, LikesRepository likesRepository, KakaoService kakaoService, UserService userService) {
         this.postRepository = postRepository;
         this.attachmentService = attachmentService;
         this.commentRepository = commentRepository;
         this.likesRepository = likesRepository;
+        this.kakaoService = kakaoService;
+        this.userService = userService;
     }
 
     public List<Post> findAll() {
         return postRepository.findAll();
     }
 
-    public Post save(PostDto postDto, MultipartFile[] files) {
-
+    public PostDto save(PostDto postDto, MultipartFile[] files, String accessToken) throws JsonProcessingException {
         Post postToSave = convertToPost(postDto, new Post());
 
         validate(postToSave.getTitle(), postToSave.getContent(), postToSave.getCategory()); //제목이나 내용이나 카테고리가 빈 상태에서 생성 시도
@@ -48,15 +54,26 @@ public class PostService {
         if (files != null && files.length > 0) {
             saveMultipartFiles(files, postToSave);
         }
-        return postToSave;
+
+        Long userId = kakaoService.getUserInfo(accessToken).getId();
+        User user = userService.findById(userId);
+
+        postToSave.setUser(user);
+        postToSave = postRepository.save(postToSave);
+
+        return converToPostDto(postToSave);
     }
 
     public Post findById(Long id) {
         Optional<Post> post = postRepository.findById(id);
-        if (post.isPresent())
+        if (post.isPresent()){
+            System.out.println("Post 반환");
             return post.get();
-        else
+        }
+        else{
+            System.out.println("Post null");
             throw new RuntimeException("Post not found");
+        }
     }
 
     @Transactional
@@ -64,6 +81,7 @@ public class PostService {
          Optional<Post> post = postRepository.findById(id);
          if(post.isEmpty())
              throw new RuntimeException("Post not found");
+
          attachmentService.deleteAllByPost(post.get());
          commentRepository.deleteAllByPostId(id);
          likesRepository.deleteAllByPostId(id);
@@ -106,6 +124,26 @@ public class PostService {
         post.setContent(postDto.getContent());
         post.setCreatedDate(new Date());
         return post;
+    }
+
+    public List<PostDto> convertToPostDtoList(List<Post> posts) {
+        List<PostDto> postDtoList = new ArrayList<>();
+        for (Post post : posts){
+            postDtoList.add(converToPostDto(post));
+        }
+        return postDtoList;
+    }
+
+    public PostDto converToPostDto(Post postToSave) {
+        return PostDto.builder()
+                .id(postToSave.getId())
+                .title(postToSave.getTitle())
+                .content(postToSave.getContent())
+                .category(postToSave.getCategory())
+                .userId(postToSave.getUser().getId())
+                .createdDate(postToSave.getCreatedDate())
+                .attachments(attachmentService.convertToDto(postToSave.getAttachments()))
+                .build();
     }
 
     private void validate(String title, String content, String category) {

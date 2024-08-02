@@ -41,27 +41,31 @@ public class UserService {
 
     // 전체 정보 수정
     public void updateUser(Long userId, String username, String profile, String snsUrl, String email) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateUserInfo(username, profile, snsUrl, email);
         userRepository.save(user);
     }
 
     // 개별 정보 수정
     public void updateUsername(Long userId, String username) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateUsername(username);
         userRepository.save(user);
     }
 
     public void updateProfile(Long userId, String profile) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateProfile(profile);
         userRepository.save(user);
     }
 
     public void updateSnsUrl(Long userId, String snsUrl) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateSnsUrl(snsUrl);
         userRepository.save(user);
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
     }
 }
