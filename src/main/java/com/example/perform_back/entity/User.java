@@ -14,14 +14,13 @@ public class User {
     @Id
     @Column(name = "user_id")
     private Long id;
-
     private String username;
     private String profile;
-    private Date createdDate;
-    private boolean isExpert;
     private String snsUrl;
     private String email;
-    private boolean ad;
+    private Date createdDate;
+    private boolean isExpert;
+    private boolean ad; //홍보의 기본 값은 on
 
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
@@ -29,27 +28,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<ReviewPost> reviewPosts;
-
-    public void updateUserInfo(String username, String profile, String snsUrl, String email) {
-        this.username = username;
-        this.profile = profile;
-        this.snsUrl = snsUrl;
-        this.email = email;
-        this.ad = true; //홍보의 기본 값은 on
-    }
-
-    // 이메일 제외
-    public void updateUsername(String username) {
-        this.username = username;
-    }
-
-    public void updateProfile(String profile) {
-        this.profile = profile;
-    }
-
-    public void updateSnsUrl(String snsUrl) {
-        this.snsUrl = snsUrl;
-    }
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference

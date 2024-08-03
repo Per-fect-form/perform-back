@@ -3,11 +3,13 @@ package com.example.perform_back.service;
 import com.example.perform_back.dto.UserDto;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
+import com.example.perform_back.global.service.FileS3Service;
 import com.example.perform_back.repository.UserRepository;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
@@ -15,13 +17,27 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private final FileS3Service fileS3Service;
     private UserRepository userRepository;
     private KakaoService kakaoService;
 
     @Autowired
-    public UserService(UserRepository userRepository, KakaoService kakaoService){
+    public UserService(UserRepository userRepository, KakaoService kakaoService, FileS3Service fileS3Service){
         this.userRepository = userRepository;
         this.kakaoService = kakaoService;
+        this.fileS3Service = fileS3Service;
+    }
+
+    public UserDto getUserInfo(String accessToken) {
+        User user = findByAccessToken(accessToken);
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .profile(user.getProfile())
+                .email(user.getEmail())
+                .snsUrl(user.getSnsUrl())
+                .isExpert(user.isExpert())
+                .ad(user.isAd()).build();
     }
 
     // 사용자 정보 DB저장
@@ -37,32 +53,39 @@ public class UserService {
         user.setProfile(profile);
         user.setEmail(email);
         user.setCreatedDate(new Date());
+        user.setExpert(false);
+        user.setAd(true);
         userRepository.save(user);
     }
 
     // 전체 정보 수정
-    public void updateUser(UserDto userDto) {
-//        User user = findById(userId);
-//        user.updateUserInfo(username, profile, snsUrl, email);
-//        userRepository.save(user);
+    public void updateUser(UserDto userDto, MultipartFile profile, String accessToken) {
+        User user = findByAccessToken(accessToken);
+        user.setUsername(userDto.getUsername());
+        user.setSnsUrl(userDto.getSnsUrl());
+        if(profile != null) {
+            String profileUrl = fileS3Service.uploadProfileImage(profile);
+            user.setProfile(profileUrl);
+        }
+        userRepository.save(user);
     }
 
     // 개별 정보 수정
     public void updateUsername(Long userId, String username) {
         User user = findById(userId);
-        user.updateUsername(username);
+        user.setUsername(username);
         userRepository.save(user);
     }
 
     public void updateProfile(Long userId, String profile) {
         User user = findById(userId);
-        user.updateProfile(profile);
+        user.setProfile(profile);
         userRepository.save(user);
     }
 
     public void updateSnsUrl(Long userId, String snsUrl) {
         User user = findById(userId);
-        user.updateSnsUrl(snsUrl);
+        user.setSnsUrl(snsUrl);
         userRepository.save(user);
     }
 
@@ -85,4 +108,5 @@ public class UserService {
         Long userId = kakaoService.getUserInfo(token).getId();
         return findById(userId);
     }
+
 }

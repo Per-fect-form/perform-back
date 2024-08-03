@@ -47,6 +47,10 @@ public class FileS3Service {
         return amazonS3.getUrl(bucketName, changedName).toString(); // 데이터베이스에 저장할 파일이 저장된 주소
     }
 
+    public String uploadProfileImage(MultipartFile image) {
+        return uploadFileToS3(image, "image");
+    }
+
     public Attachment uploadImage(MultipartFile image) {
         String originName = image.getOriginalFilename();
         String storedImagePath = uploadFileToS3(image, "image");

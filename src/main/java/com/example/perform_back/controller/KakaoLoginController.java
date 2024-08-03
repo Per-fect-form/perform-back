@@ -1,6 +1,5 @@
 package com.example.perform_back.controller;
 
-import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.dto.KakaoInfoDto;
 import com.example.perform_back.dto.KakaoLoginDto;
 import com.example.perform_back.service.KakaoService;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 @Slf4j
 @Controller
