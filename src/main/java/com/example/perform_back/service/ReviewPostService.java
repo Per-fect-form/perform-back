@@ -43,7 +43,7 @@ public class ReviewPostService {
         this.userRepository = userRepository;
         this.userService = userService;
     }
-    public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files, String accessToken) throws JsonProcessingException {
+    public ReviewPost createReviewPost(ReviewPostDto reviewPostDto, MultipartFile[] files, String accessToken) {
         User user = userService.findByAccessToken(accessToken); // 저장하기 전에 accessToken 먼저 검사
 
         validateFiles(files); // 파일이 빈 경우에도 파일 유형문제로 처리되는 경우를 제어
