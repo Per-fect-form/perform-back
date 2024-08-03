@@ -54,9 +54,9 @@ public class PostController {
         List<PostDto> postDtoList = postService.findByTitle(title);
         return ResponseEntity.status(HttpStatus.OK).body(postDtoList);
     }
-    // category = {back, chest, shoulder, arm, abs, lower, routine, nutrition}
+
     @Operation(summary = "카테고리로 게시글 조회")
-    @GetMapping("/{category}")
+    @GetMapping("/category/{category}")
     public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable String category) {
         List<PostDto> postDtoList = postService.findByCategory(category);
         return ResponseEntity.status(HttpStatus.OK).body(postDtoList);
