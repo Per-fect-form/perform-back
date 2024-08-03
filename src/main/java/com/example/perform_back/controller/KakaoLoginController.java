@@ -1,5 +1,6 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.dto.KakaoInfoDto;
 import com.example.perform_back.dto.KakaoLoginDto;
 import com.example.perform_back.service.KakaoService;
@@ -9,12 +10,16 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -43,7 +48,7 @@ public class KakaoLoginController {
         String nickname = userInfo.getNickname();
         String profileImageUrl = userInfo.getProfileImageUrl();
         String email = userInfo.getEmail();
-        userService.saveOrUpdateUser(id, nickname, profileImageUrl, email);
+        userService.saveUser(id, nickname, profileImageUrl, email);
 
         System.out.println("AccessToken: " + accessToken);
         System.out.println("Email: " + userInfo.getEmail());
@@ -58,7 +63,7 @@ public class KakaoLoginController {
 
     @GetMapping("/auth/kakao/callback")
     @ResponseBody
-    public KakaoLoginDto frontCallback(@RequestParam("code") String code) {
+    public ResponseEntity<KakaoLoginDto> frontCallback(@RequestParam("code") String code) {
 
         String accessToken = kakaoService.getAccessTokenFromKakao(code);
         KakaoInfoDto userInfo = kakaoService.getUserInfo(accessToken);
@@ -68,13 +73,12 @@ public class KakaoLoginController {
         String nickname = userInfo.getNickname();
         String profileImageUrl = userInfo.getProfileImageUrl();
         String email = userInfo.getEmail();
-        userService.saveOrUpdateUser(id, nickname, profileImageUrl, email);
+        userService.saveUser(id, nickname, profileImageUrl, email);
 
         System.out.println("AccessToken: " + accessToken);
         System.out.println("Email: " + userInfo.getEmail());
-
-        return KakaoLoginDto.builder()
-                .accessToken(accessToken).build();
+        KakaoLoginDto kakaoLoginDto = KakaoLoginDto.builder().accessToken(accessToken).build();
+        return ResponseEntity.status(HttpStatus.OK).body(kakaoLoginDto);
     }
 
     @GetMapping("/logout")
