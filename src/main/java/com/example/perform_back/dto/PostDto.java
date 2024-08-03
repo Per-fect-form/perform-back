@@ -13,6 +13,7 @@ public class PostDto {
     private String content;
     private String category;
     private Long userId;
+    private String username;
     private Date createdDate;
 
     private List<AttachmentDto> attachments;
@@ -20,12 +21,13 @@ public class PostDto {
     private boolean liked;
 
     @Builder
-    public PostDto(Long id, String title, String content, String category, Long userId, Date createdDate, List<AttachmentDto> attachments, int likesNum, boolean liked) {
+    public PostDto(Long id, String title, String content, String category, Long userId, String username, Date createdDate, List<AttachmentDto> attachments, int likesNum, boolean liked) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.category = category;
         this.userId = userId;
+        this.username = username;
         this.createdDate = createdDate;
         this.attachments = attachments;
         this.likesNum = likesNum;

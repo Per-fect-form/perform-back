@@ -10,5 +10,5 @@ import lombok.Getter;
 public class KakaoLoginDto {
 
     public String accessToken;
-    public String refreshToken;
+//    public String refreshToken;
 }
