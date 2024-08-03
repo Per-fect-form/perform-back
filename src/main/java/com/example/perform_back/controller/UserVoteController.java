@@ -20,8 +20,8 @@ public class UserVoteController {
 
     @Operation(summary = "심사 게시물에 대한 투표")
     @PostMapping("/{reviewPostId}")
-    public ResponseEntity<Vote> vote(@PathVariable Long reviewPostId, @RequestParam String isAgree) {
-        Vote vote = userVoteService.vote(reviewPostId, isAgree);
+    public ResponseEntity<Vote> vote(@PathVariable Long reviewPostId, @RequestParam Boolean isAgree,  @RequestHeader("Authorization") String accessToken) {
+        Vote vote = userVoteService.vote(reviewPostId, isAgree, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(vote);
     }
 }
