@@ -36,7 +36,7 @@ public class UserController {
     // 전체 업데이트
     @Operation(summary = "유저 네임 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@RequestPart UserDto userDto, @RequestPart(value = "profile", required = false) MultipartFile profile,
+    public ResponseEntity<String> updateUser(@RequestPart("user") UserDto userDto, @RequestPart(value = "profile", required = false) MultipartFile profile,
                                              @RequestHeader("Authorization") String accessToken) {
         userService.updateUser(userDto, profile, accessToken);
         return ResponseEntity.status(HttpStatus.OK).body("수정이 완료되었습니다.");
