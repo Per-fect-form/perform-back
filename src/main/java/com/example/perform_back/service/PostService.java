@@ -2,18 +2,14 @@ package com.example.perform_back.service;
 
 import com.example.perform_back.dto.AttachmentDto;
 import com.example.perform_back.dto.AttachmentsDto;
-import com.example.perform_back.dto.CommentDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Attachment;
-import com.example.perform_back.entity.Comment;
 import com.example.perform_back.entity.Post;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.repository.CommentRepository;
 import com.example.perform_back.repository.LikesRepository;
 import com.example.perform_back.repository.PostRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +34,7 @@ public class PostService {
         return convertToPostDtoList(postRepository.findAll());
     }
 
-    public PostDto save(PostDto postDto, MultipartFile[] files, String accessToken) throws JsonProcessingException {
+    public PostDto save(PostDto postDto, MultipartFile[] files, String accessToken) {
         Post postToSave = convertToPost(postDto, new Post());
 
         validate(postToSave.getTitle(), postToSave.getContent(), postToSave.getCategory()); //제목이나 내용이나 카테고리가 빈 상태에서 생성 시도
@@ -52,7 +48,7 @@ public class PostService {
         postToSave.setUser(user);
         postToSave = postRepository.save(postToSave);
 
-        return converToPostDto(postToSave);
+        return converToPostDto(postToSave, user);
     }
 
     public Post findById(Long id) {
@@ -63,18 +59,36 @@ public class PostService {
             throw new RuntimeException("존재하지 않는 게시글 ID 입니다.");
     }
 
-    @Transactional
-    public void deleteById(Long id) {
-         Post post = findById(id);
-
-         attachmentService.deleteAllByPost(post);
-         commentRepository.deleteAllByPostId(id);
-         likesRepository.deleteAllByPostId(id);
-         postRepository.deleteById(id);
+    public PostDto getPost(Long id, String accessToken) {
+        Post post = findById(id);
+        if(accessToken != null){
+            User user = userService.findByAccessToken(accessToken);
+            return converToPostDto(post,user);
+        } else
+            return converToPostDto(post, null);
     }
 
-    public Post updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files) {
+    @Transactional
+    public void deleteById(Long id, String accessToken) {
         Post post = findById(id);
+        User user = userService.findByAccessToken(accessToken);
+
+        if(!post.getUser().getId().equals(user.getId()))
+            throw new RuntimeException("삭제 권한이 없습니다.");
+
+        attachmentService.deleteAllByPost(post);
+        commentRepository.deleteAllByPostId(id);
+        likesRepository.deleteAllByPostId(id);
+        postRepository.deleteById(id);
+    }
+
+    public PostDto updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files, String accessToken) {
+        Post post = findById(id);
+        User user = userService.findByAccessToken(accessToken);
+
+        if(!post.getUser().getId().equals(user.getId()))
+            throw new RuntimeException("수정 권한이 없습니다.");
+
         Post postToUpdate = convertToPost(postDto, post);
 
         if (postToUpdate.getComments().size() != 0) throw new RuntimeException("댓글이 달린 게시물은 수정할 수 없습니다."); //댓글이 달린 후 수정 시도
@@ -89,7 +103,9 @@ public class PostService {
         if (files != null && files.length > 0) {
             saveMultipartFiles(files, postToUpdate);
         }
-        return postRepository.save(postToUpdate);
+
+        postToUpdate = postRepository.save(postToUpdate);
+        return converToPostDto(postToUpdate, user);
     }
 
     private void saveMultipartFiles(MultipartFile[] files, Post post) {
@@ -110,7 +126,7 @@ public class PostService {
     public List<PostDto> convertToPostDtoList(List<Post> posts) {
         List<PostDto> postDtoList = new ArrayList<>();
         for (Post post : posts){
-            postDtoList.add(converToPostDto(post));
+            postDtoList.add(converToPostDto(post, null));
         }
         return postDtoList;
     }
@@ -126,16 +142,18 @@ public class PostService {
         return convertToPostDtoList(postRepository.findByTitleContaining(title));
     }
 
-    public PostDto converToPostDto(Post postToSave) {
+    public PostDto converToPostDto(Post post, User user) {
+        System.out.println("convert to Dto");
         return PostDto.builder()
-                .id(postToSave.getId())
-                .title(postToSave.getTitle())
-                .content(postToSave.getContent())
-                .category(postToSave.getCategory())
-                .userId(postToSave.getUser().getId())
-                .createdDate(postToSave.getCreatedDate())
-                .attachments(convertToAttchmentDtoList(postToSave.getAttachments()))
-                .likesNum(likesRepository.findByPost(postToSave).size())
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory())
+                .userId(post.getUser().getId())
+                .createdDate(post.getCreatedDate())
+                .attachments(convertToAttchmentDtoList(post.getAttachments()))
+                .likesNum(likesRepository.findByPost(post).size())
+                .liked(user != null && likesRepository.existsByPostAndUser(post, user))
                 .build();
     }
 

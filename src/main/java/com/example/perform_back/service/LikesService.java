@@ -40,7 +40,7 @@ public class LikesService {
         return likesRepository.findByComment(comment);
     }
 
-    public LikesDto likesPost(Long postId, String accessToken) throws JsonProcessingException {
+    public LikesDto likesPost(Long postId, String accessToken) {
         User user = userService.findByAccessToken(accessToken);
         Post post = postService.findById(postId);
 

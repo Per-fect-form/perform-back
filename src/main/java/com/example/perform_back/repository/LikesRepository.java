@@ -19,4 +19,5 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
     Likes findByUserAndReviewPost(User user, ReviewPost reviewPost);
 
     boolean existsByCommentAndUser(Comment comment, User user);
+    boolean existsByPostAndUser(Post post, User user);
 }

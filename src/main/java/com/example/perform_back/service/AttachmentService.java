@@ -30,7 +30,7 @@ public class AttachmentService {
         } else if (isVideoFile(ext)) {
             attachment = fileS3Service.uploadVideo(file);
         } else {
-            throw new RuntimeException("Unsupported file type");
+            throw new RuntimeException("지원하지 않는 파일 형식입니다.");
         }
         return attachmentRepository.save(attachment);
     }

@@ -27,7 +27,7 @@ public class CommentService {
     private final UserService userService;
     private final PostService postService;
 
-    public CommentDto createComment(Long postId, CommentDto commentDto, String accessToken) throws JsonProcessingException {
+    public CommentDto createComment(Long postId, CommentDto commentDto, String accessToken) {
         if (commentDto.getContent() == null || commentDto.getContent().isEmpty())
             throw new RuntimeException("댓글을 작성해주세요"); //댓글 내용이 빈 상태로 댓글 생성
 
@@ -56,7 +56,7 @@ public class CommentService {
         return this.commentRepository.findAll();
     }
 
-    public void deleteById(Long id, String accessToken) throws JsonProcessingException {
+    public void deleteById(Long id, String accessToken) {
         Comment comment = findById(id);
         User user = userService.findByAccessToken(accessToken);
 
@@ -67,7 +67,7 @@ public class CommentService {
         likesRepository.deleteByCommentId(id);
     }
 
-    public List<CommentDto> findByPostAndUser(Long postId, String accessToken) throws JsonProcessingException {
+    public List<CommentDto> findByPostAndUser(Long postId, String accessToken) {
         User user = userService.findByAccessToken(accessToken);
         List<Comment> comments = commentRepository.findByPostId(postId);
         return convertToCommentDtoList(comments,user);
