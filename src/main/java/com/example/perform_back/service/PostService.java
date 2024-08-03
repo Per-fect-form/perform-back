@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +26,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final LikesRepository likesRepository;
     private final UserService userService;
+    private final String[] categories = {"back", "chest", "shoulder", "arm", "abs", "lower", "routine", "nutrition"};
 
     public List<PostDto> findAll() {
         return convertToPostDtoList(postRepository.findAll());
@@ -142,14 +140,25 @@ public class PostService {
         return convertToPostDtoList(postRepository.findByTitleContaining(title));
     }
 
+    public List<PostDto> findByCategory(String category) {
+        if(isValidCategory(category))
+            return convertToPostDtoList(postRepository.findByCategory(category));
+        else
+            throw new RuntimeException("올바르지 않은 카테고리입니다.");
+    }
+
+    private boolean isValidCategory(String category) {
+        return Arrays.asList(categories).contains(category);
+    }
+
     public PostDto converToPostDto(Post post, User user) {
-        System.out.println("convert to Dto");
         return PostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
                 .userId(post.getUser().getId())
+                .username(post.getUser().getUsername())
                 .createdDate(post.getCreatedDate())
                 .attachments(convertToAttchmentDtoList(post.getAttachments()))
                 .likesNum(likesRepository.findByPost(post).size())
@@ -170,4 +179,5 @@ public class PostService {
                 })
                 .collect(Collectors.toList());
     }
+
 }

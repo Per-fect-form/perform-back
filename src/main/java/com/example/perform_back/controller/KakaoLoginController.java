@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("")
+@RequestMapping
 public class KakaoLoginController {
 
     @Value("${kakao.restApi_key}")
@@ -48,9 +48,9 @@ public class KakaoLoginController {
         session.setMaxInactiveInterval(60 * 30);    // 로그인 유지 시간 30분
         session.setAttribute("Authorization", accessToken);    // 세션에 accessToken 저장
         // 로그인 성공 후 리다이렉트 테스트
-        String location = "https://kauth.kakao.com/oauth/logout?client_id=" + restApi_key + "&logout_redirect_uri=" + logout_uri;
-        model.addAttribute("location", location);
-        return "mypage";
+//        String location = "https://kauth.kakao.com/oauth/logout?client_id=" + restApi_key + "&logout_redirect_uri=" + logout_uri;
+//        model.addAttribute("location", location);
+        return "redirect:" + logout_uri;
     }
 
     @GetMapping("/logout")
