@@ -3,6 +3,8 @@ package com.example.perform_back.service;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
 import com.example.perform_back.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,5 +65,15 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         user.updateSnsUrl(snsUrl);
         userRepository.save(user);
+    }
+
+    public void adOff(Long userId, Boolean state) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        user.setAd(state);
+        userRepository.save(user);
+    }
+
+    public List<User> getAllExpertsForAd() {
+        return userRepository.findAllExpertsForAd();
     }
 }

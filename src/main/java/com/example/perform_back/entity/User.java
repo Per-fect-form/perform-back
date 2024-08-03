@@ -21,6 +21,7 @@ public class User {
     private boolean isExpert;
     private String snsUrl;
     private String email;
+    private boolean ad;
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
@@ -35,6 +36,7 @@ public class User {
         this.profile = profile;
         this.snsUrl = snsUrl;
         this.email = email;
+        this.ad = true; //홍보의 기본 값은 on
     }
 
     // 이메일 제외
