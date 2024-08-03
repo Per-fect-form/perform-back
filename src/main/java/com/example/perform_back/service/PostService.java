@@ -140,6 +140,11 @@ public class PostService {
         return convertToPostDtoList(postRepository.findByTitleContaining(title));
     }
 
+    public List<PostDto> findMyPosts(String accessToken) {
+        User user = userService.findByAccessToken(accessToken);
+        return convertToPostDtoList(postRepository.findByUser(user));
+    }
+
     public List<PostDto> findByCategory(String category) {
         if(isValidCategory(category))
             return convertToPostDtoList(postRepository.findByCategory(category));

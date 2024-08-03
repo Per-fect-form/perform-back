@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Tag(name = "User", description = "User API")
 public class UserController {
 
@@ -26,7 +26,15 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "유저 정보 조회")
+    @GetMapping("/my")
+    public ResponseEntity<UserDto> getUserInfo(@RequestHeader("Authorization") String accessToken) {
+        UserDto userDto = userService.getUserInfo(accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
+    }
+
     // 전체 업데이트
+    @Operation(summary = "유저 네임 수정")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(@RequestPart UserDto userDto, @RequestPart(value = "profile", required = false) MultipartFile profile,
                                              @RequestHeader("Authorization") String accessToken) {

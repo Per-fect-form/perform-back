@@ -79,4 +79,10 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(updatePost);
     }
 
+    @Operation(summary = "내 게시글 조회")
+    @GetMapping("/my")
+    public ResponseEntity<List<PostDto>> getMyPost(@RequestHeader("Authorization") String accessToken) {
+        List<PostDto> postDtoList = postService.findMyPosts(accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(postDtoList);
+    }
 }

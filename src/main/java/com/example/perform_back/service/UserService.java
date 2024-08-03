@@ -28,6 +28,18 @@ public class UserService {
         this.fileS3Service = fileS3Service;
     }
 
+    public UserDto getUserInfo(String accessToken) {
+        User user = findByAccessToken(accessToken);
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .profile(user.getProfile())
+                .email(user.getEmail())
+                .snsUrl(user.getSnsUrl())
+                .isExpert(user.isExpert())
+                .ad(user.isAd()).build();
+    }
+
     // 사용자 정보 DB저장
     public void saveUser(Long id, String username, String profile, String email) {
         // 주어진 ID로 사용자 검색
@@ -96,4 +108,5 @@ public class UserService {
         Long userId = kakaoService.getUserInfo(token).getId();
         return findById(userId);
     }
+
 }
