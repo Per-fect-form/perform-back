@@ -2,7 +2,6 @@ package com.example.perform_back.controller;
 
 import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
-import com.example.perform_back.entity.Post;
 import com.example.perform_back.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,41 +27,49 @@ public class PostController {
 
     @Operation(summary = "전체 게시글 조회")
     @GetMapping
-    public List<Post> getAllPosts(){
-        return this.postService.findAll();
+    public ResponseEntity<List<PostDto>> getAllPosts(){
+        System.out.println("전체 게시글 조회");
+        return ResponseEntity.status(HttpStatus.OK).body(postService.findAll());
     }
 
     @Operation(summary = "게시글 업로드")
     @PostMapping("/upload")
-    public ResponseEntity<Post> createPost(@RequestPart("post") PostDto postDto, @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        Post savedPost = postService.save(postDto, files);
+    public ResponseEntity<PostDto> createPost(@RequestPart("post") PostDto postDto,
+                                              @RequestPart(value = "files", required = false) MultipartFile[] files,
+                                              @RequestHeader("Authorization") String accessToken) {
+        PostDto savedPost = postService.save(postDto, files, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPost); //201 created
     }
-
+    
     @Operation(summary = "특정 게시글 조회")
     @GetMapping("/{id}")
-    public Post getPost(@PathVariable Long id) {
-        return this.postService.findById(id);
+    public ResponseEntity<PostDto> getPost(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String accessToken) {
+        PostDto postDto = postService.getPost(id, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(postDto);
     }
 
     @Operation(summary = "제목으로 게시글 조회")
     @GetMapping("/search/{title}")
-    public List<Post> getPostByTitle(@PathVariable String title) {
-        return this.postService.findByTitle(title);
+    public ResponseEntity<List<PostDto>> getPostByTitle(@PathVariable String title) {
+        List<PostDto> postDtoList = postService.findByTitle(title);
+        return ResponseEntity.status(HttpStatus.OK).body(postDtoList);
     }
 
     @Operation(summary = "특정 게시글 삭제")
     @DeleteMapping("/{id}")
-    public void deletePostById(@PathVariable Long id) {
-        this.postService.deleteById(id);
+    public ResponseEntity<Long> deletePostById(@PathVariable Long id , @RequestHeader("Authorization") String accessToken){
+        this.postService.deleteById(id, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(id);
     }
 
     @Operation(summary = "특정 게시글 수정")
     @PutMapping("/{id}")
-    public Post updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
+    public ResponseEntity<PostDto> updatePostById(@PathVariable Long id, @RequestPart("post") PostDto postDto,
                                @RequestPart(value = "attachments", required = false) AttachmentsDto attachmentsDto,
-                               @RequestPart(value = "files", required = false) MultipartFile[] files) {
-        return  postService.updateById(id, postDto, attachmentsDto, files);
+                               @RequestPart(value = "files", required = false) MultipartFile[] files,
+                               @RequestHeader("Authorization") String accessToken) {
+        PostDto updatePost = postService.updateById(id, postDto, attachmentsDto, files, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(updatePost);
     }
 
 }

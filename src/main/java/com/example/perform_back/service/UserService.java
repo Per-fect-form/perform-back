@@ -14,8 +14,14 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
+    private KakaoService kakaoService;
+
+    @Autowired
+    public UserService(UserRepository userRepository, KakaoService kakaoService){
+        this.userRepository = userRepository;
+        this.kakaoService = kakaoService;
+    }
 
     // 사용자 정보 DB저장
     public User saveOrUpdateUser(Long id, String username, String profile, String email) {
@@ -43,29 +49,30 @@ public class UserService {
 
     // 전체 정보 수정
     public void updateUser(Long userId, String username, String profile, String snsUrl, String email) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateUserInfo(username, profile, snsUrl, email);
         userRepository.save(user);
     }
 
     // 개별 정보 수정
     public void updateUsername(Long userId, String username) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateUsername(username);
         userRepository.save(user);
     }
 
     public void updateProfile(Long userId, String profile) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateProfile(profile);
         userRepository.save(user);
     }
 
     public void updateSnsUrl(Long userId, String snsUrl) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        User user = findById(userId);
         user.updateSnsUrl(snsUrl);
         userRepository.save(user);
     }
+
 
     public void adOff(Long userId, Boolean state) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
@@ -75,5 +82,23 @@ public class UserService {
 
     public List<User> getAllExpertsForAd() {
         return userRepository.findAllExpertsForAd();
+
+    }
+    public User findById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    public User findByAccessToken(String token) {
+        Long userId = kakaoService.getUserInfo(token).getId();
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isPresent())
+            return user.get();
+        else
+            throw new RuntimeException("유효하지 않은 유저입니다.");
+    }
+
+    public boolean isValidToken(String token) {
+        return kakaoService.getUserInfo(token) != null;
+
     }
 }

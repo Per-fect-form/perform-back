@@ -1,7 +1,9 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.LikesDto;
 import com.example.perform_back.entity.Likes;
 import com.example.perform_back.service.LikesService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +22,28 @@ public class LikesController {
     private final LikesService likesService;
 
     @Operation(summary = "게시글 공감 누르기")
-    @PostMapping("/post/{postId}/{username}")
-    public ResponseEntity<Likes> likesPost(@PathVariable Long postId,@PathVariable String username) {
-        Likes likes =  likesService.likesPost(postId, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(likes);
+    @PostMapping("/post/{postId}")
+    public ResponseEntity<LikesDto> likesPost(@PathVariable Long postId,
+                                              @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        LikesDto likesDto =  likesService.likesPost(postId, accessToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
     }
 
     @Operation(summary = "심사 게시글 공감 누르기")
-    @PostMapping("/reviewpost/{reviewpostId}/{username}")
-    public ResponseEntity<Likes> likesReviewPost(@PathVariable Long reviewPostId,@PathVariable String username) {
-        Likes likes = likesService.likesReviewPost(reviewPostId, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(likes);
+    @PostMapping("/reviewpost/{reviewpostId}")
+    public ResponseEntity<LikesDto> likesReviewPost(@PathVariable Long reviewPostId,
+                                                    @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        LikesDto likesDto = likesService.likesReviewPost(reviewPostId, accessToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
     }
 
     @Operation(summary = "댓글 공감 누르기")
-    @PostMapping("/comment/{commentId}/{username}")
-    public ResponseEntity<Likes> likesComment(@PathVariable Long commentId, @PathVariable String username) {
-        Likes likes = likesService.likesComment(commentId, username);
-        return ResponseEntity.status(HttpStatus.CREATED).body(likes);
+    @PostMapping("/comment/{commentId}")
+    public ResponseEntity<LikesDto> likesComment(@PathVariable Long commentId,
+                                                 @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
+        LikesDto likesDto = likesService.likesComment(commentId, accessToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
     }
-
 
     @Operation(summary = "게시글 공감 내역 조회")
     @GetMapping("/post/{postId}")

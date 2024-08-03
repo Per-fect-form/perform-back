@@ -24,7 +24,6 @@ public class User {
     private boolean ad;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user")

@@ -5,50 +5,50 @@ import com.example.perform_back.dto.AttachmentsDto;
 import com.example.perform_back.dto.PostDto;
 import com.example.perform_back.entity.Attachment;
 import com.example.perform_back.entity.Post;
+import com.example.perform_back.entity.User;
 import com.example.perform_back.repository.CommentRepository;
 import com.example.perform_back.repository.LikesRepository;
 import com.example.perform_back.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final AttachmentService attachmentService;
     private final CommentRepository commentRepository;
     private final LikesRepository likesRepository;
+    private final UserService userService;
 
-    @Autowired
-    public PostService(PostRepository postRepository, AttachmentService attachmentService,
-        CommentRepository commentRepository, LikesRepository likesRepository) {
-        this.postRepository = postRepository;
-        this.attachmentService = attachmentService;
-        this.commentRepository = commentRepository;
-        this.likesRepository = likesRepository;
+    public List<PostDto> findAll() {
+        return convertToPostDtoList(postRepository.findAll());
     }
 
-    public List<Post> findAll() {
-        return postRepository.findAll();
-    }
-
-    public Post save(PostDto postDto, MultipartFile[] files) {
-
+    public PostDto save(PostDto postDto, MultipartFile[] files, String accessToken) {
         Post postToSave = convertToPost(postDto, new Post());
 
         validate(postToSave.getTitle(), postToSave.getContent(), postToSave.getCategory()); //제목이나 내용이나 카테고리가 빈 상태에서 생성 시도
+        User user = userService.findByAccessToken(accessToken); // 게시글 저장하기 전에 accessToken 먼저 검사
 
         postToSave = postRepository.save(postToSave);
         if (files != null && files.length > 0) {
             saveMultipartFiles(files, postToSave);
         }
-        return postToSave;
+
+        postToSave.setUser(user);
+        postToSave = postRepository.save(postToSave);
+
+        return converToPostDto(postToSave, user);
     }
 
     public Post findById(Long id) {
@@ -56,27 +56,40 @@ public class PostService {
         if (post.isPresent())
             return post.get();
         else
-            throw new RuntimeException("Post not found");
+            throw new RuntimeException("존재하지 않는 게시글 ID 입니다.");
+    }
+
+    public PostDto getPost(Long id, String accessToken) {
+        Post post = findById(id);
+        if(accessToken != null){
+            User user = userService.findByAccessToken(accessToken);
+            return converToPostDto(post,user);
+        } else
+            return converToPostDto(post, null);
     }
 
     @Transactional
-    public void deleteById(Long id) {
-         Optional<Post> post = postRepository.findById(id);
-         if(post.isEmpty())
-             throw new RuntimeException("Post not found");
-         attachmentService.deleteAllByPost(post.get());
-         commentRepository.deleteAllByPostId(id);
-         likesRepository.deleteAllByPostId(id);
-         postRepository.deleteById(id);
+    public void deleteById(Long id, String accessToken) {
+        Post post = findById(id);
+        User user = userService.findByAccessToken(accessToken);
+
+        if(!post.getUser().getId().equals(user.getId()))
+            throw new RuntimeException("삭제 권한이 없습니다.");
+
+        attachmentService.deleteAllByPost(post);
+        commentRepository.deleteAllByPostId(id);
+        likesRepository.deleteAllByPostId(id);
+        postRepository.deleteById(id);
     }
 
-    public Post updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files) {
-        Optional<Post> post = postRepository.findById(id);
-        if(post.isEmpty())
-            throw new RuntimeException("Post not found");
-        Post postToUpdate = convertToPost(postDto, post.get());
+    public PostDto updateById(Long id, PostDto postDto, AttachmentsDto attachmentsDto, MultipartFile[] files, String accessToken) {
+        Post post = findById(id);
+        User user = userService.findByAccessToken(accessToken);
 
+        if(!post.getUser().getId().equals(user.getId()))
+            throw new RuntimeException("수정 권한이 없습니다.");
 
+        Post postToUpdate = convertToPost(postDto, post);
 
         if (postToUpdate.getComments().size() != 0) throw new RuntimeException("댓글이 달린 게시물은 수정할 수 없습니다."); //댓글이 달린 후 수정 시도
         validate(postToUpdate.getTitle(), postToUpdate.getContent(), postToUpdate.getCategory()); //제목이나 내용이나 카테고리가 빈 상태에서 수정 시도
@@ -90,7 +103,9 @@ public class PostService {
         if (files != null && files.length > 0) {
             saveMultipartFiles(files, postToUpdate);
         }
-        return postRepository.save(postToUpdate);
+
+        postToUpdate = postRepository.save(postToUpdate);
+        return converToPostDto(postToUpdate, user);
     }
 
     private void saveMultipartFiles(MultipartFile[] files, Post post) {
@@ -108,6 +123,14 @@ public class PostService {
         return post;
     }
 
+    public List<PostDto> convertToPostDtoList(List<Post> posts) {
+        List<PostDto> postDtoList = new ArrayList<>();
+        for (Post post : posts){
+            postDtoList.add(converToPostDto(post, null));
+        }
+        return postDtoList;
+    }
+
     private void validate(String title, String content, String category) {
         if(title == null || content == null || category == null ||
             title.isEmpty() || content.isEmpty() || category.isEmpty()) {
@@ -115,7 +138,36 @@ public class PostService {
         }
     }
 
-    public List<Post> findByTitle(String title) {
-        return postRepository.findByTitleContaining(title);
+    public List<PostDto> findByTitle(String title) {
+        return convertToPostDtoList(postRepository.findByTitleContaining(title));
+    }
+
+    public PostDto converToPostDto(Post post, User user) {
+        System.out.println("convert to Dto");
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory())
+                .userId(post.getUser().getId())
+                .createdDate(post.getCreatedDate())
+                .attachments(convertToAttchmentDtoList(post.getAttachments()))
+                .likesNum(likesRepository.findByPost(post).size())
+                .liked(user != null && likesRepository.existsByPostAndUser(post, user))
+                .build();
+    }
+
+    private List<AttachmentDto> convertToAttchmentDtoList(List<Attachment> attachments) {
+        if(attachments == null)
+            return null;
+
+        else return attachments.stream()
+                .map(attachment -> {
+                    AttachmentDto dto = new AttachmentDto();
+                    dto.setId(attachment.getId());
+                    dto.setFilePath(attachment.getPath());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
