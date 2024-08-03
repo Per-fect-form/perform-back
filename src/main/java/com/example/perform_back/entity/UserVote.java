@@ -31,7 +31,7 @@ public class UserVote {
     @JsonBackReference
     private Vote vote;
 
-    private String isAgree;
+    private Boolean isAgree;
     private Date voteDate;
 
     public UserVote() {
