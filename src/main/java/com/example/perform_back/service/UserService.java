@@ -1,9 +1,10 @@
 package com.example.perform_back.service;
 
+import com.example.perform_back.dto.UserDto;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
 import com.example.perform_back.repository.UserRepository;
-import java.util.ArrayList;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,34 +25,26 @@ public class UserService {
     }
 
     // 사용자 정보 DB저장
-    public User saveOrUpdateUser(Long id, String username, String profile, String email) {
+    public void saveUser(Long id, String username, String profile, String email) {
         // 주어진 ID로 사용자 검색
         Optional<User> userOptional = userRepository.findById(id);
-        User user;
+        if (userOptional.isPresent()) return;
 
-        if (userOptional.isPresent()) {
-            // 사용자가 존재하면 정보 업데이트
-            user = userOptional.get();
-            user.updateUserInfo(username, profile, user.getSnsUrl(), email);
-        } else {
-            // 사용자가 존재하지 않으면 새로운 사용자 생성
-            user = new User();
-            user.setId(id);
-            user.setUsername(username);
-            user.setProfile(profile);
-            user.setEmail(email);
-            user.setCreatedDate(new Date());
-        }
-
-        //반환
-        return userRepository.save(user);
+        // 사용자가 존재하지 않으면 새로운 사용자 생성
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        user.setProfile(profile);
+        user.setEmail(email);
+        user.setCreatedDate(new Date());
+        userRepository.save(user);
     }
 
     // 전체 정보 수정
-    public void updateUser(Long userId, String username, String profile, String snsUrl, String email) {
-        User user = findById(userId);
-        user.updateUserInfo(username, profile, snsUrl, email);
-        userRepository.save(user);
+    public void updateUser(UserDto userDto) {
+//        User user = findById(userId);
+//        user.updateUserInfo(username, profile, snsUrl, email);
+//        userRepository.save(user);
     }
 
     // 개별 정보 수정
@@ -75,30 +68,21 @@ public class UserService {
 
 
     public void adOff(Long userId, Boolean state) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
-        user.setAd(state);
+        User user = findById(userId);
+        findById(userId).setAd(state);
         userRepository.save(user);
     }
 
     public List<User> getAllExpertsForAd() {
         return userRepository.findAllExpertsForAd();
-
     }
+
     public User findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
     }
 
     public User findByAccessToken(String token) {
         Long userId = kakaoService.getUserInfo(token).getId();
-        Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent())
-            return user.get();
-        else
-            throw new RuntimeException("유효하지 않은 유저입니다.");
-    }
-
-    public boolean isValidToken(String token) {
-        return kakaoService.getUserInfo(token) != null;
-
+        return findById(userId);
     }
 }

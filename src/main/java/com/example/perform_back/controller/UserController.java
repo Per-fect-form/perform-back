@@ -1,11 +1,13 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.UserDto;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
 import com.example.perform_back.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,16 +27,9 @@ public class UserController {
 
     // 전체 업데이트
     @PutMapping("/{id}")
-    public void updateUser(@PathVariable Long id,
-                           @RequestParam(required = false) String username,
-                           @RequestParam(required = false) String profile,
-                           @RequestParam(required = false) String snsUrl,
-                           @RequestParam(required = false) String email) {
-        try {
-            userService.updateUser(id, username, profile, snsUrl, email);
-        } catch (UserNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
+    public ResponseEntity<String> updateUser(@RequestParam(required = false) UserDto userDto) {
+        userService.updateUser(userDto);
+        return ResponseEntity.status(HttpStatus.OK).body("수정이 완료되었습니다.");
     }
 
     // 개별 필드 업데이트
