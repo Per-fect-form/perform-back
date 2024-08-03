@@ -10,4 +10,5 @@ public class UserDto {
     private String email;
     private String snsUrl;
     private boolean isExpert;
+    private boolean ad;
 }

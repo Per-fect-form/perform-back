@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +28,9 @@ public class UserController {
 
     // 전체 업데이트
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@RequestParam(required = false) UserDto userDto) {
-        userService.updateUser(userDto);
+    public ResponseEntity<String> updateUser(@RequestPart UserDto userDto, @RequestPart(value = "profile", required = false) MultipartFile profile,
+                                             @RequestHeader("Authorization") String accessToken) {
+        userService.updateUser(userDto, profile, accessToken);
         return ResponseEntity.status(HttpStatus.OK).body("수정이 완료되었습니다.");
     }
 
@@ -36,37 +38,26 @@ public class UserController {
     @Operation(summary = "유저 네임 수정")
     @PatchMapping("/{id}/username")
     public void updateUsername(@PathVariable Long id, @RequestParam String username) {
-        try {
-            userService.updateUsername(id, username);
-        } catch (UserNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
+        userService.updateUsername(id, username);
     }
 
     @Operation(summary = "유저 사진 수정")
     @PatchMapping("/{id}/profile")
     public void updateProfile(@PathVariable Long id, @RequestParam String profile) {
-        try {
-            userService.updateProfile(id, profile);
-        } catch (UserNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
+        userService.updateProfile(id, profile);
     }
 
     @Operation(summary = "유저 sns 수정")
     @PatchMapping("/{id}/snsUrl")
     public void updateSnsUrl(@PathVariable Long id, @RequestParam String snsUrl) {
-        try {
-            userService.updateSnsUrl(id, snsUrl);
-        } catch (UserNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
+        userService.updateSnsUrl(id, snsUrl);
     }
 
     @Operation(summary = "유저 고수홍보 온오프")
     @PatchMapping("/{id}/ad")
-    public void adOff(@PathVariable Long id, @RequestParam Boolean state) { //boolean으로 on이나 off를 입력
+    public ResponseEntity<String> adOff(@PathVariable Long id, @RequestParam Boolean state) { //boolean으로 on이나 off를 입력
         userService.adOff(id, state);
+        return ResponseEntity.status(HttpStatus.OK).body("온오프가 완료되었습니다.");
     }
 
     @Operation(summary = "홍보유저 전체 불러오기")
