@@ -79,6 +79,7 @@ public class CommentService {
                 .content(comment.getContent())
                 .date(new Date())
                 .userId(comment.getUser().getId())
+                .username(comment.getUser().getUsername())
                 .postId(comment.getPost().getId())
                 .likesNum(likesRepository.findByComment(comment).size())
                 .liked(likesRepository.existsByCommentAndUser(comment, user))
