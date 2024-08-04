@@ -12,17 +12,19 @@ public class CommentDto {
     private Date date;
     private Long postId;
     private Long userId;
+    private String username;
     private int likesNum;
     private boolean liked;
     private boolean isExpert;
 
     @Builder
-    public CommentDto(Long id, String content, Date date, Long postId, Long userId, int likesNum, boolean liked, boolean isExpert) {
+    public CommentDto(Long id, String content, Date date, Long postId, Long userId, String username,int likesNum, boolean liked, boolean isExpert) {
         this.id = id;
         this.content = content;
         this.date = date;
         this.postId = postId;
         this.userId = userId;
+        this.username = username;
         this.likesNum = likesNum;
         this.liked = liked;
         this.isExpert = isExpert;
