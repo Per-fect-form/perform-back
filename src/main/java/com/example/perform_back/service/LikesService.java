@@ -1,14 +1,8 @@
 package com.example.perform_back.service;
 
 import com.example.perform_back.dto.LikesDto;
-import com.example.perform_back.dto.PostDto;
-import com.example.perform_back.entity.Comment;
-import com.example.perform_back.entity.Likes;
-import com.example.perform_back.entity.Post;
-import com.example.perform_back.entity.ReviewPost;
-import com.example.perform_back.entity.User;
+import com.example.perform_back.entity.*;
 import com.example.perform_back.repository.LikesRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,19 +34,24 @@ public class LikesService {
         return likesRepository.findByComment(comment);
     }
 
-    public LikesDto likesPost(Long postId, String accessToken) {
+    public LikesDto likes(String category, Long id, String accessToken) {
         User user = userService.findByAccessToken(accessToken);
-        Post post = postService.findById(postId);
 
+        if(category.equals("post")) return likesPost(id, user);
+        else if(category.equals("reviewPost")) return likesReviewPost(id, user);
+        else if(category.equals("comment")) return likesComment(id, user);
+        else throw new RuntimeException("올바르지 않은 카테고리입니다.");
+    }
+
+    public LikesDto likesPost(Long postId, User user) {
+        Post post = postService.findById(postId);
         // 유저가 이미 해당 게시물에 공감을 눌렀는지 확인
         Likes existingLike = likesRepository.findByUserAndPost(user, post);
 
         // 이미 공감을 눌렀던 경우
-        if (existingLike != null) {
-            likesRepository.delete(existingLike);
-            throw new RuntimeException("공감이 취소되었습니다.");
-        } else {
-            // 공감을 누르지 않은 경우
+        if (existingLike != null)
+            throw new RuntimeException("이미 공감이 되어있습니다.");
+        else {
             Likes likes = new Likes();
             likes.setLikedDate(new Date());
             likes.setUser(user);
@@ -62,19 +61,15 @@ public class LikesService {
         }
     }
 
-    public LikesDto likesReviewPost(Long reviewPostId, String accessToken) throws JsonProcessingException {
-        User user = userService.findByAccessToken(accessToken);
+    public LikesDto likesReviewPost(Long reviewPostId, User user) {
         ReviewPost reviewPost = reviewPostService.findById(reviewPostId);
-
         // 유저가 이미 해당 리뷰 게시물에 좋아요를 눌렀는지 확인
         Likes existingLike = likesRepository.findByUserAndReviewPost(user, reviewPost);
 
         // 이미 좋아요를 눌렀던 경우
-        if (existingLike != null) {
-            likesRepository.delete(existingLike);
-            throw new RuntimeException("공감이 취소되었습니다.");
-        } else {
-            // 좋아요를 누르지 않은 경우
+        if (existingLike != null)
+            throw new RuntimeException("이미 공감이 되어있습니다.");
+        else {
             Likes likes = new Likes();
             likes.setLikedDate(new Date());
             likes.setUser(user);
@@ -84,19 +79,15 @@ public class LikesService {
         }
     }
 
-    public LikesDto likesComment(Long commentId, String accessToken) throws JsonProcessingException {
-        User user = userService.findByAccessToken(accessToken);
+    public LikesDto likesComment(Long commentId, User user) {
         Comment comment = commentService.findById(commentId);
-
         // 유저가 이미 해당 댓글에 좋아요를 눌렀는지 확인
         Likes existingLike = likesRepository.findByUserAndComment(user, comment);
 
         // 이미 공감을 눌렀던 경우
-        if (existingLike != null) {
-            likesRepository.delete(existingLike);
-            throw new RuntimeException("공감이 취소되었습니다.");
-        } else {
-            // 공감을 누르지 않은 경우
+        if (existingLike != null)
+            throw new RuntimeException("이미 공감이 되어있습니다.");
+        else {
             Likes likes = new Likes();
             likes.setLikedDate(new Date());
             likes.setUser(user);
@@ -110,6 +101,37 @@ public class LikesService {
         likesRepository.deleteById(id);
     }
 
+    public void dislikes(String category, Long id, String accessToken) {
+        User user = userService.findByAccessToken(accessToken);
+        if(category.equals("post")) dislikesPost(id, user);
+        else if(category.equals("reviewPost")) dislikesReviewPost(id, user);
+        else if(category.equals("comment")) dislikesComment(id, user);
+        else throw new RuntimeException("올바르지 않은 카테고리입니다.");
+    }
+
+    private void dislikesComment(Long commentId, User user) {
+        Comment comment = commentService.findById(commentId);
+        Likes existingLike = likesRepository.findByUserAndComment(user, comment);
+
+        if (existingLike != null) likesRepository.delete(existingLike);
+        else throw new RuntimeException("공감이 되어있지 않습니다.");
+    }
+
+    private void dislikesReviewPost(Long reviewPostId, User user) {
+        ReviewPost reviewPost = reviewPostService.findById(reviewPostId);
+        Likes existingLike = likesRepository.findByUserAndReviewPost(user, reviewPost);
+
+        if (existingLike != null) likesRepository.delete(existingLike);
+        else throw new RuntimeException("공감이 되어있지 않습니다.");
+    }
+
+    private void dislikesPost(Long postId, User user) {
+        Post post = postService.findById(postId);
+        Likes existingLike = likesRepository.findByUserAndPost(user, post);
+
+        if (existingLike != null) likesRepository.delete(existingLike);
+        else throw new RuntimeException("공감이 되어있지 않습니다.");
+    }
 
     private LikesDto converToLikesDto(Likes likes, String type) {
         LikesDto.LikesDtoBuilder likesDtoBuilder = LikesDto.builder()
@@ -123,5 +145,4 @@ public class LikesService {
             default -> throw new RuntimeException("잘못된 타입입니다.");
         };
     }
-
 }

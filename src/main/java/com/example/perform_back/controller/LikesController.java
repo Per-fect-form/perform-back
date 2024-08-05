@@ -21,28 +21,20 @@ public class LikesController {
 
     private final LikesService likesService;
 
-    @Operation(summary = "게시글 공감 누르기")
-    @PostMapping("/post/{postId}")
-    public ResponseEntity<LikesDto> likesPost(@PathVariable Long postId,
-                                              @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
-        LikesDto likesDto =  likesService.likesPost(postId, accessToken);
+    @Operation(summary = "공감 누르기")
+    @PostMapping("/{category}/{id}")
+    public ResponseEntity<LikesDto> likes(@PathVariable String category, @PathVariable Long id,
+                                          @RequestHeader("Authorization") String accessToken)  {
+        LikesDto likesDto = likesService.likes(category, id, accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
     }
 
-    @Operation(summary = "심사 게시글 공감 누르기")
-    @PostMapping("/reviewpost/{reviewpostId}")
-    public ResponseEntity<LikesDto> likesReviewPost(@PathVariable Long reviewPostId,
-                                                    @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
-        LikesDto likesDto = likesService.likesReviewPost(reviewPostId, accessToken);
-        return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
-    }
-
-    @Operation(summary = "댓글 공감 누르기")
-    @PostMapping("/comment/{commentId}")
-    public ResponseEntity<LikesDto> likesComment(@PathVariable Long commentId,
-                                                 @RequestHeader("Authorization") String accessToken) throws JsonProcessingException {
-        LikesDto likesDto = likesService.likesComment(commentId, accessToken);
-        return ResponseEntity.status(HttpStatus.CREATED).body(likesDto);
+    @Operation(summary = "공감 취소")
+    @DeleteMapping("/{category}/{id}")
+    public ResponseEntity<String> deleteLikes(@PathVariable String category, @PathVariable Long id,
+                                              @RequestHeader("Authorization") String accessToken) {
+        likesService.dislikes(category, id, accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body("공감이 취소되었습니다.");
     }
 
     @Operation(summary = "게시글 공감 내역 조회")
@@ -63,9 +55,4 @@ public class LikesController {
         return likesService.findCommentLikes(commentId);
     }
 
-    @Operation(summary = "공감 삭제")
-    @GetMapping("/{id}")
-    public void deleteLikes(@PathVariable Long id) {
-        likesService.deleteById(id);
-    }
 }
