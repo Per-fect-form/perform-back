@@ -1,6 +1,9 @@
 package com.example.perform_back.service;
 
+import com.example.perform_back.dto.CommentDto;
+import com.example.perform_back.dto.ExpertDto;
 import com.example.perform_back.dto.UserDto;
+import com.example.perform_back.entity.Comment;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
 import com.example.perform_back.global.service.FileS3Service;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -96,8 +100,24 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<User> getAllExpertsForAd() {
-        return userRepository.findAllExpertsForAd();
+    public List<ExpertDto> getAllExpertsForAd() {
+        List<User> experts = userRepository.findAllExpertsForAd();
+        return convertToExpertDtoList(experts);
+    }
+
+    public ExpertDto converToExpertDto(User user) {
+        return ExpertDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .snsUrl(user.getSnsUrl())
+                .profile(user.getProfile())
+                .build();
+    }
+
+    private List<ExpertDto> convertToExpertDtoList(List<User> users) {
+        return users.stream()
+                .map(this::converToExpertDto)
+                .collect(Collectors.toList());
     }
 
     public User findById(Long userId) {
