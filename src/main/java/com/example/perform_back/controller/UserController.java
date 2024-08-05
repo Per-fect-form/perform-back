@@ -1,5 +1,6 @@
 package com.example.perform_back.controller;
 
+import com.example.perform_back.dto.ExpertDto;
 import com.example.perform_back.dto.UserDto;
 import com.example.perform_back.entity.User;
 import com.example.perform_back.exception.UserNotFoundException;
@@ -70,8 +71,9 @@ public class UserController {
 
     @Operation(summary = "홍보유저 전체 불러오기")
     @GetMapping("/experts")
-    public List<User> getAllExpertsForAd() {
-        return userService.getAllExpertsForAd();
+    public ResponseEntity<List<ExpertDto>> getAllExpertsForAd() {
+        List<ExpertDto> experts = userService.getAllExpertsForAd();
+        return ResponseEntity.status(HttpStatus.OK).body(experts);
     }
 
 }
