@@ -63,8 +63,8 @@ public class CommentService {
         if(!comment.getUser().getId().equals(user.getId()))
             throw new RuntimeException("삭제 권한이 없습니다.");
 
+        likesRepository.deleteByCommentId(id);d
         commentRepository.deleteById(id);
-        likesRepository.deleteByCommentId(id);
     }
 
     public List<CommentDto> findByPostAndUser(Long postId, String accessToken) {
